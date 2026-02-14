@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket 流式输出测试</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        #messages { 
+            border: 1px solid #ccc; 
+            padding: 10px; 
+            height: 300px; 
+            overflow-y: scroll;
+            margin-bottom: 10px;
+            background: #f9f9f9;
+        }
+        #input { width: 70%; padding: 5px; }
+        button { padding: 5px 10px; }
+        .user-message { color: blue; margin: 5px 0; }
+        .agent-message { color: green; margin: 5px 0; }
+        .system-message { color: gray; margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <h2>WebSocket 流式输出测试</h2>
+    
+    <div>
+        <label>客户端ID: <input type="text" id="clientId" value="test_browser"></label>
+        <button onclick="connect()">连接</button>
+        <button onclick="disconnect()">断开</button>
+    </div>
+    
+    <div id="messages"></div>
+    
+    <div>
+        <input type="text" id="input" placeholder="输入消息..." disabled>
+        <button onclick="sendMessage()" id="sendBtn" disabled>发送</button>
+    </div>
+
+    <script>
+        let ws = null;
+        const messagesDiv = document.getElementById('messages');
+        const input = document.getElementById('input');
+        const sendBtn = document.getElementById('sendBtn');
+        const clientIdInput = document.getElementById('clientId');
+
+        function addMessage(text, type) {
+            const div = document.createElement('div');
+            div.className = type + '-message';
+            div.textContent = text;
+            messagesDiv.appendChild(div);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function connect() {
+            const clientId = clientIdInput.value;
+            if (!clientId) {
+                alert('请输入客户端ID');
+                return;
+            }
+
+            ws = new WebSocket(`ws://localhost:8000/ws/${clientId}`);
+
+            ws.onopen = () => {
+                addMessage('✅ 已连接', 'system');
+                input.disabled = false;
+                sendBtn.disabled = false;
+            };
+
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                
+                if (data.type === 'connected') {
+                    addMessage(`系统: ${data.data.message}`, 'system');
+                }
+                else if (data.type === 'stream_chunk') {
+                    // 流式输出 - 追加到当前行
+                    const lastMessage = messagesDiv.lastElementChild;
+                    if (lastMessage && lastMessage.className === 'agent-message') {
+                        lastMessage.textContent += data.data.content;
+                    } else {
+                        addMessage(data.data.content, 'agent');
+                    }
+                }
+                else if (data.type === 'complete') {
+                    addMessage('\n✅ 完成', 'system');
+                }
+                else if (data.type === 'error') {
+                    addMessage(`❌ 错误: ${data.data.message}`, 'system');
+                }
+            };
+
+            ws.onclose = () => {
+                addMessage('❌ 连接已断开', 'system');
+                input.disabled = true;
+                sendBtn.disabled = true;
+            };
+
+            ws.onerror = (error) => {
+                addMessage(`❌ 错误: ${error}`, 'system');
+            };
+        }
+
+        function disconnect() {
+            if (ws) {
+                ws.close();
+            }
+        }
+
+        function sendMessage() {
+            const message = input.value;
+            if (!message) return;
+
+            addMessage(`用户: ${message}`, 'user');
+            
+            ws.send(JSON.stringify({
+                action: 'chat',
+                message: message
+            }));
+
+            input.value = '';
+        }
+
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>

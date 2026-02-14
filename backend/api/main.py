@@ -1,14 +1,22 @@
 """
 AI报告写作系统 - 主应用入口
 阶段0：基础FastAPI应用，带数据库支持
+阶段1.2：添加WebSocket支持
 """
+from fastapi.staticfiles import StaticFiles #添加静态文件服务
+import os
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from contextlib import asynccontextmanager
+from loguru import logger
 
 from store.database import db, init_db, get_db
 from config.settings import settings
+from api.controllers import websocket_controller  # 导入WebSocket控制器（阶段1.2）
+
+#配置日志   
+logger.add("logs/app.log", rotation="500 MB", retention="10 days")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -17,18 +25,18 @@ async def lifespan(app: FastAPI):
     - 启动时：连接数据库、初始化表
     - 关闭时：关闭数据库连接
     """
-    print("🚀 应用启动中...")
+    logger.info("🚀 应用启动中...")
     # 启动时
     await db.connect()
     await init_db()
-    print("✅ 数据库就绪")
+    logger.info("✅ 数据库就绪")
     
     yield
     
     # 关闭时
-    print("👋 应用关闭中...")
+    logger.info("👋 应用关闭中...")
     await db.close()
-    print("✅ 数据库连接已关闭")
+    logger.info("✅ 数据库连接已关闭")
 
 # 创建FastAPI应用
 app = FastAPI(
@@ -47,6 +55,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# 注册路由
+app.include_router(websocket_controller.router)  # 注册WebSocket控制器
+
+# 在创建app后添加静态文件路由
+# 创建static目录（如果不存在）
+os.makedirs("static", exist_ok=True)
+# 挂载静态文件
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+
 @app.get("/")
 async def root():
     """健康检查接口"""
@@ -54,7 +72,8 @@ async def root():
         "service": "AI Report Writing System",
         "status": "running",
         "version": "0.1.0",
-        "database": "sqlite"
+        "database": "sqlite",
+        "websocket": "ws://localhost:8000/ws/{client_id}"
     }
 
 @app.get("/health")
@@ -64,13 +83,19 @@ async def health_check(db_session = Depends(get_db)):
         # 简单查询测试数据库
         result = await db.fetch_one("SELECT 1 as test")
         db_ok = result is not None
+
+        # 检查agent是否可用
+        agent_ok = settings.DASHSCOPE_API_KEY is not None
     except Exception as e:
+        logger.error(f"健康检查失败: {e}")
         db_ok = False
-        print(f"数据库检查失败: {e}")
+        agent_ok = False
     
     return {
-        "status": "healthy" if db_ok else "degraded",
-        "database": "connected" if db_ok else "disconnected"
+        "status": "healthy" if db_ok and agent_ok else "degraded",
+        "database": "connected" if db_ok else "disconnected",
+        "agent": "configured" if agent_ok else "missing_api_key",
+        "active_websockets": len(websocket_controller.active_connections)
     }
 
 @app.get("/db-test")
