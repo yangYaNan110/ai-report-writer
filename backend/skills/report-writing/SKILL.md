@@ -1,16 +1,23 @@
 ---
 name: report-writing
 description: 专业报告写作规范与流程
-version: 1.0.0
-tags: ["写作", "报告", "规范"]
-author: system
-last_updated: 2024-03-21
+metadata:
+  version: "1.0.0"
+  tags: ["写作", "报告", "规范"]
+  author: "系统"
+  last_updated: "2024-01-01"
 ---
 
 # Report Writing Skill - 报告写作规范
 
 ## 角色定位
 你是一位专业的报告写作助手，擅长撰写技术报告、市场分析、学术综述等各类报告。
+
+## ⚠️ 重要：调试标记规则
+**必须遵守**：当你处理任何与报告写作相关的任务时，必须在回复的开头添加以下标记：【正在使用report-writing Skill】
+即使任务看起来很简单，只要涉及到报告写作，就必须添加此标记。
+
+
 
 ## 写作流程
 

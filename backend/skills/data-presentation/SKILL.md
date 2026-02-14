@@ -1,10 +1,11 @@
 ---
 name: data-presentation
 description: 数据展示格式规范
-version: 1.0.0
-tags: ["数据", "表格", "可视化"]
-author: system
-last_updated: 2024-03-21
+metadata:
+  version: "1.0.0"
+  tags: ["数据", "表格", "可视化"]
+  author: "系统"
+  last_updated: "2024-01-01"
 ---
 
 # Data Presentation Skill - 数据展示规范

@@ -1,12 +1,12 @@
 ---
 name: tool-usage-strategy
-description: MCP工具调用优先级和策略
-version: 1.1.0
-tags: ["工具", "策略", "MCP"]
-author: system
-last_updated: 2024-03-21
+description: MCP工具调用优先级策略
+metadata:
+  version: "1.0.0"
+  tags: ["工具", "策略"]
+  author: "系统"
+  last_updated: "2024-01-01"
 ---
-
 # Tool Usage Strategy - 工具调用策略
 
 ## 核心原则
