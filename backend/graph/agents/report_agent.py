@@ -19,7 +19,15 @@ class ReportAgent:
     基础报告写作Agent
     职责：处理基础的对话和写作任务，支持可选加载Skill
     """
+    # 单例模式：类变量
+    _instance = None
+    _initialized = False
     
+    def __new__(cls, *args, **kwargs):
+        """单例模式：确保只有一个实例"""
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
     def __init__(self, model_id: str = "qwen-plus", skill_names: Optional[List[str]] = None):
         """
         初始化Agent
@@ -29,6 +37,10 @@ class ReportAgent:
             skill_names: 要加载的Skill名称列表，如 ["report-writing", "tool-usage-strategy"]
                          如果为None或空列表，则不加载任何Skill（保持基础功能）
         """
+
+        # 单例模式：如果已经初始化过，直接返回
+        if self._initialized:
+            return
         # 从settings获取API Key
         api_key = settings.DASHSCOPE_API_KEY
         if not api_key:
@@ -83,6 +95,8 @@ class ReportAgent:
         
         self.agent = Agent(**agent_kwargs)
         print(f"✅ Agent初始化完成，使用模型: {model_id}")
+         # 标记为已初始化
+        self._initialized = True
     
     def _load_skills(self, skill_names: List[str]) -> Optional[Any]:
         """

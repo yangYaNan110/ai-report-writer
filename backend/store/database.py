@@ -1,15 +1,24 @@
 """
 数据库连接配置 - 使用原生SQL
 阶段3.2：完善表结构，支持对话、消息、段落存储
+添加了 ConversationStore 所需的所有数据库操作方法
 """
 import aiosqlite
 import json
-from typing import Optional, Any, List
+from typing import Optional, Any, Dict, List, Tuple
 import os
 from datetime import datetime
 
 # 数据库文件路径
 DB_PATH = os.path.join(os.path.dirname(__file__), '..', 'data', 'conversations.db')
+
+
+def json_serializer(obj):
+    """JSON序列化器，处理datetime等特殊类型"""
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
+
 
 class Database:
     """数据库连接管理器 - 原生SQL版本"""
@@ -38,6 +47,7 @@ class Database:
         if self.connection:
             await self.connection.close()
             self.connection = None
+            print("🔌 数据库连接已关闭")
     
     async def execute(self, sql: str, params: tuple = ()) -> aiosqlite.Cursor:
         """执行SQL语句（不返回结果）"""
@@ -98,6 +108,8 @@ class Database:
             await self.connection.rollback()
             raise e
     
+    # ==================== 表结构初始化 ====================
+    
     async def _init_tables(self):
         """初始化数据库表结构（内部调用）"""
         
@@ -110,7 +122,7 @@ class Database:
         await self.execute("DROP TABLE IF EXISTS messages")
         await self.execute("DROP TABLE IF EXISTS conversations")
         
-        # 创建conversations表（新结构）
+        # 创建conversations表
         await self.execute("""
             CREATE TABLE IF NOT EXISTS conversations (
                 id TEXT PRIMARY KEY,
@@ -122,7 +134,7 @@ class Database:
             )
         """)
         
-        # 创建messages表（新结构）
+        # 创建messages表
         await self.execute("""
             CREATE TABLE IF NOT EXISTS messages (
                 id TEXT PRIMARY KEY,
@@ -135,7 +147,7 @@ class Database:
             )
         """)
         
-        # 创建sections表（新结构）
+        # 创建sections表
         await self.execute("""
             CREATE TABLE IF NOT EXISTS sections (
                 id TEXT PRIMARY KEY,
@@ -151,19 +163,316 @@ class Database:
             )
         """)
         
-        # 创建索引...
-        # ... 索引代码同上
+        # 创建索引
+        await self.execute("""
+            CREATE INDEX IF NOT EXISTS idx_conversations_updated 
+            ON conversations(updated_at DESC)
+        """)
+        
+        await self.execute("""
+            CREATE INDEX IF NOT EXISTS idx_messages_conversation_id 
+            ON messages(conversation_id)
+        """)
+        
+        await self.execute("""
+            CREATE INDEX IF NOT EXISTS idx_messages_created_at 
+            ON messages(created_at)
+        """)
+        
+        await self.execute("""
+            CREATE INDEX IF NOT EXISTS idx_sections_conversation_id 
+            ON sections(conversation_id)
+        """)
+        
+        await self.execute("""
+            CREATE INDEX IF NOT EXISTS idx_sections_status 
+            ON sections(status)
+        """)
         
         print("✅ 数据库表结构重建完成")
+    
+    # ==================== Conversation 操作 ====================
+    
+    async def get_conversation(self, thread_id: str) -> Optional[Dict[str, Any]]:
+        """获取对话基本信息"""
+        query = "SELECT * FROM conversations WHERE id = ?"
+        row = await self.fetch_one(query, [thread_id])
+        if row:
+            # 解析JSON字段
+            if row.get('context'):
+                try:
+                    row['context'] = json.loads(row['context'])
+                except:
+                    row['context'] = {}
+        return row
+    
+    async def save_conversation_info(self, thread_id: str, info: Dict[str, Any]) -> None:
+        """保存对话基本信息（INSERT OR REPLACE）"""
+        query = """
+        INSERT OR REPLACE INTO conversations (id, title, phase, context, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?)
+        """
+        await self.execute(
+            query,
+            [
+                thread_id,
+                info.get('title', '新对话'),
+                info.get('phase', 'planning'),
+                json.dumps(info.get('context', {}), default=json_serializer),
+                info.get('created_at', datetime.utcnow()),
+                info.get('updated_at', datetime.utcnow())
+            ]
+        )
+    
+    async def update_conversation(self, thread_id: str, updates: Dict[str, Any]) -> None:
+        """更新对话信息"""
+        if not updates:
+            return
+            
+        sets = []
+        values = []
+        for key, value in updates.items():
+            if key in ['title', 'phase', 'context']:
+                sets.append(f"{key} = ?")
+                if key == 'context':
+                    values.append(json.dumps(value, default=json_serializer))
+                else:
+                    values.append(value)
+        
+        if not sets:
+            return
+            
+        sets.append("updated_at = ?")
+        values.append(datetime.utcnow())
+        values.append(thread_id)
+        
+        query = f"UPDATE conversations SET {', '.join(sets)} WHERE id = ?"
+        await self.execute(query, values)
+    
+    async def delete_conversation(self, thread_id: str) -> None:
+        """删除对话（级联删除相关消息和段落）"""
+        query = "DELETE FROM conversations WHERE id = ?"
+        await self.execute(query, [thread_id])
+    
+    async def list_conversations(self, limit: int = 50, offset: int = 0) -> List[Dict[str, Any]]:
+        """获取对话列表（按更新时间倒序）"""
+        query = """
+        SELECT id, title, phase, created_at, updated_at 
+        FROM conversations 
+        ORDER BY updated_at DESC 
+        LIMIT ? OFFSET ?
+        """
+        rows = await self.fetch_all(query, [limit, offset])
+        return rows
+    
+    # ==================== Message 操作 ====================
+    
+    async def get_messages(self, thread_id: str) -> List[Dict[str, Any]]:
+        """获取对话的消息列表"""
+        query = """
+        SELECT * FROM messages 
+        WHERE conversation_id = ? 
+        ORDER BY created_at ASC
+        """
+        rows = await self.fetch_all(query, [thread_id])
+        
+        # 解析JSON字段
+        for row in rows:
+            if row.get('metadata'):
+                try:
+                    row['metadata'] = json.loads(row['metadata'])
+                except:
+                    row['metadata'] = {}
+        
+        return rows
+    
+    async def save_message(self, thread_id: str, message: Dict[str, Any]) -> None:
+        """保存单条消息"""
+        query = """
+        INSERT INTO messages (id, conversation_id, role, content, created_at, metadata)
+        VALUES (?, ?, ?, ?, ?, ?)
+        """
+        await self.execute(
+            query,
+            [
+                message['id'],
+                thread_id,
+                message['role'],
+                message['content'],
+                message.get('created_at', datetime.utcnow()),
+                json.dumps(message.get('metadata', {}), default=json_serializer)
+            ]
+        )
+    
+    async def save_messages(self, thread_id: str, messages: List[Dict[str, Any]]) -> None:
+        """批量保存消息"""
+        if not messages:
+            return
+            
+        query = """
+        INSERT INTO messages (id, conversation_id, role, content, created_at, metadata)
+        VALUES (?, ?, ?, ?, ?, ?)
+        """
+        params_list = []
+        for msg in messages:
+            params_list.append((
+                msg['id'],
+                thread_id,
+                msg['role'],
+                msg['content'],
+                msg.get('created_at', datetime.utcnow()),
+                json.dumps(msg.get('metadata', {}), default=json_serializer)
+            ))
+        
+        await self.execute_many(query, params_list)
+    
+    async def delete_message(self, msg_id: str) -> None:
+        """删除单条消息"""
+        query = "DELETE FROM messages WHERE id = ?"
+        await self.execute(query, [msg_id])
+    
+    async def delete_messages_by_conversation(self, thread_id: str) -> None:
+        """删除对话的所有消息"""
+        query = "DELETE FROM messages WHERE conversation_id = ?"
+        await self.execute(query, [thread_id])
+    
+    # ==================== Section 操作 ====================
+    
+    async def get_sections(self, thread_id: str) -> List[Dict[str, Any]]:
+        """获取对话的所有段落"""
+        query = """
+        SELECT * FROM sections 
+        WHERE conversation_id = ? 
+        ORDER BY "order" ASC
+        """
+        rows = await self.fetch_all(query, [thread_id])
+        
+        # 解析JSON字段
+        for row in rows:
+            if row.get('comments'):
+                try:
+                    row['comments'] = json.loads(row['comments'])
+                except:
+                    row['comments'] = []
+        
+        return rows
+    
+    async def save_section(self, thread_id: str, section: Dict[str, Any]) -> None:
+        """保存单条段落"""
+        query = """
+        INSERT INTO sections (
+            id, conversation_id, title, content, status, "order", 
+            created_at, updated_at, comments
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """
+        await self.execute(
+            query,
+            [
+                section['id'],
+                thread_id,
+                section['title'],
+                section['content'],
+                section.get('status', 'draft'),
+                section.get('order', 0),
+                section.get('created_at', datetime.utcnow()),
+                section.get('updated_at', datetime.utcnow()),
+                json.dumps(section.get('comments', []), default=json_serializer)
+            ]
+        )
+    
+    async def save_sections(self, thread_id: str, sections: List[Dict[str, Any]]) -> None:
+        """批量保存段落"""
+        if not sections:
+            return
+            
+        query = """
+        INSERT INTO sections (
+            id, conversation_id, title, content, status, "order", 
+            created_at, updated_at, comments
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """
+        params_list = []
+        for sec in sections:
+            params_list.append((
+                sec['id'],
+                thread_id,
+                sec['title'],
+                sec['content'],
+                sec.get('status', 'draft'),
+                sec.get('order', 0),
+                sec.get('created_at', datetime.utcnow()),
+                sec.get('updated_at', datetime.utcnow()),
+                json.dumps(sec.get('comments', []), default=json_serializer)
+            ))
+        
+        await self.execute_many(query, params_list)
+    
+    async def update_section(self, section_id: str, updates: Dict[str, Any]) -> None:
+        """更新段落信息"""
+        if not updates:
+            return
+            
+        sets = []
+        values = []
+        for key, value in updates.items():
+            if key in ['title', 'content', 'status', 'order', 'comments']:
+                sets.append(f"{key} = ?")
+                if key == 'comments':
+                    values.append(json.dumps(value, default=json_serializer))
+                else:
+                    values.append(value)
+        
+        if not sets:
+            return
+            
+        sets.append("updated_at = ?")
+        values.append(datetime.utcnow())
+        values.append(section_id)
+        
+        query = f"UPDATE sections SET {', '.join(sets)} WHERE id = ?"
+        await self.execute(query, values)
+    
+    async def delete_section(self, section_id: str) -> None:
+        """删除单条段落"""
+        query = "DELETE FROM sections WHERE id = ?"
+        await self.execute(query, [section_id])
+    
+    async def delete_sections_by_conversation(self, thread_id: str) -> None:
+        """删除对话的所有段落"""
+        query = "DELETE FROM sections WHERE conversation_id = ?"
+        await self.execute(query, [thread_id])
+    
+    # ==================== 统计查询 ====================
+    
+    async def count_messages(self, thread_id: str) -> int:
+        """统计对话的消息数量"""
+        query = "SELECT COUNT(*) as count FROM messages WHERE conversation_id = ?"
+        row = await self.fetch_one(query, [thread_id])
+        return row['count'] if row else 0
+    
+    async def count_sections(self, thread_id: str) -> int:
+        """统计对话的段落数量"""
+        query = "SELECT COUNT(*) as count FROM sections WHERE conversation_id = ?"
+        row = await self.fetch_one(query, [thread_id])
+        return row['count'] if row else 0
+    
+    async def conversation_exists(self, thread_id: str) -> bool:
+        """检查对话是否存在"""
+        query = "SELECT 1 FROM conversations WHERE id = ?"
+        row = await self.fetch_one(query, [thread_id])
+        return row is not None
+
 
 # 创建全局数据库实例
 db = Database()
+
 
 async def init_db():
     """初始化数据库（兼容旧代码）"""
     if not db.connection:
         await db.connect()
-    # _init_tables 已经在 connect 中调用，这里不再重复
     print("✅ 数据库初始化完成")
 
 
@@ -177,7 +486,8 @@ async def get_db() -> Database:
         # 注意：这里不断开连接，让连接池管理
         pass
 
-# store/database.py（在现有代码后面添加）
+
+# ==================== 命令行测试 ====================
 
 if __name__ == "__main__":
     """命令行测试
@@ -185,7 +495,6 @@ if __name__ == "__main__":
         python store/database.py
     """
     import asyncio
-    import sys
     
     async def test_connection():
         """测试数据库连接和建表"""
@@ -236,7 +545,49 @@ if __name__ == "__main__":
         fk_status = await db.fetch_one("PRAGMA foreign_keys")
         print(f"   外键约束: {'✅ 启用' if fk_status['foreign_keys'] else '❌ 未启用'}")
         
-        # 6. 关闭连接
+        # 6. 测试新增的方法
+        print("\n6. 测试新增的方法...")
+        test_thread = "test-thread-123"
+        
+        # 测试 conversation 操作
+        print("\n   📝 测试 conversation 操作...")
+        await db.save_conversation_info(test_thread, {"title": "测试对话", "phase": "planning"})
+        conv = await db.get_conversation(test_thread)
+        print(f"      获取对话: {conv['title'] if conv else 'None'}")
+        
+        # 测试 message 操作
+        print("\n   📝 测试 message 操作...")
+        import uuid
+        msg = {
+            "id": str(uuid.uuid4()),
+            "role": "user",
+            "content": "测试消息",
+            "metadata": {"test": True}
+        }
+        await db.save_message(test_thread, msg)
+        msgs = await db.get_messages(test_thread)
+        print(f"      获取消息数: {len(msgs)}")
+        
+        # 测试 section 操作
+        print("\n   📝 测试 section 操作...")
+        sec = {
+            "id": str(uuid.uuid4()),
+            "title": "测试章节",
+            "content": "测试内容",
+            "status": "draft",
+            "order": 1,
+            "comments": []
+        }
+        await db.save_section(test_thread, sec)
+        secs = await db.get_sections(test_thread)
+        print(f"      获取段落数: {len(secs)}")
+        
+        # 清理测试数据
+        await db.delete_conversation(test_thread)
+        
+        print("\n   ✅ 所有方法测试通过")
+        
+        # 7. 关闭连接
         await db.close()
         print("\n✅ 测试完成，连接已关闭")
     

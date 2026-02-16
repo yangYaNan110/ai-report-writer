@@ -14,9 +14,11 @@ from loguru import logger
 from store.database import db, init_db, get_db
 from config.settings import settings
 from api.controllers import websocket_controller  # 导入WebSocket控制器（阶段1.2）
-
+from graph.agents.report_agent import ReportAgent  # 导入ReportAgent
 #配置日志   
 logger.add("logs/app.log", rotation="500 MB", retention="10 days")
+# 全局 Agent 实例
+agent: ReportAgent = None
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -31,7 +33,13 @@ async def lifespan(app: FastAPI):
     await init_db()
     logger.info("✅ 数据库就绪")
     
+
+    # 2. 初始化 Agent（全局单例）
+    global agent
+    agent = ReportAgent()
+    logger.info("🤖 Agent 初始化完成")
     yield
+    
     
     # 关闭时
     logger.info("👋 应用关闭中...")
