@@ -2818,3 +2818,9 @@
 2026-02-16 12:49:01.690 | INFO     | main:lifespan:28 - 🚀 应用启动中...
 2026-02-16 12:49:01.693 | INFO     | main:lifespan:32 - ✅ 数据库就绪
 2026-02-16 12:49:01.693 | INFO     | main:lifespan:32 - ✅ 数据库就绪
+2026-02-16 14:20:09.089 | INFO     | store.session_manager:__init__:38 - 🚀 SessionManager 初始化完成
+2026-02-16 14:20:09.091 | INFO     | store.session_manager:connect:71 - 🔌 新连接建立: test-mock-123, 当前连接数: 1
+2026-02-16 14:20:09.091 | DEBUG    | store.session_manager:send_message:154 - 📤 消息发送成功: test-mock-123, 类型: EventType.SYNC
+2026-02-16 14:20:09.091 | INFO     | store.session_manager:_load_and_send_history:269 - 🆕 新对话，无历史记录: test-mock-123
+2026-02-16 14:20:09.091 | DEBUG    | store.session_manager:send_message:154 - 📤 消息发送成功: test-mock-123, 类型: test
+2026-02-16 14:20:09.092 | INFO     | store.session_manager:disconnect:115 - 🔌 连接断开: test-mock-123, 剩余连接数: 0
