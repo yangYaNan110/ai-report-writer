@@ -101,7 +101,8 @@ async def health_check(db_session = Depends(get_db)):
 @app.get("/db-test")
 async def test_database():
     """测试数据库操作（开发用）"""
-    from store.helpers import ConversationStore
+    # from store.helpers import ConversationStore
+    from store.conversation_store import ConversationStore
     import uuid
     
     store = ConversationStore()
