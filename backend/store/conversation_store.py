@@ -33,10 +33,13 @@ class ConversationStore:
     - update_info()        # 更新状态
     - get_phase()          # 获取当前阶段
     - set_phase()          # 设置阶段
+    阶段4：报告写作流程新增方法：
     - generate_report() - 生成完整报告
     - approve_section() - 确认段落
     - edit_section() - 修改段落
-    - regenerate_section() - 重写段落
+    - regenerate_section()   # 重写段落
+
+    规划阶段新增方法：
     - get_writing_progress() - 获取写作进度
     """
     @classmethod
@@ -75,14 +78,11 @@ class ConversationStore:
         # 所以改为由调用者显式调用 load()
         # self._load_from_db()
         
-    # ==================== 私有加载方法 ====================
-    
-    # store/conversation_store.py - 修复 _load_from_db 方法
-
     async def load(self):
         """显式加载数据（需要在创建后调用）"""
         await self._load_from_db()
         return self
+    # ==================== 私有加载方法 ====================
 
     async def _load_from_db(self):
         """从数据库加载数据到内存（连接时调用）"""
@@ -409,7 +409,6 @@ class ConversationStore:
         await self._sync_conversation_to_db()
     
     # ==================== 完整对话操作 ====================
-    
     def to_dict(self) -> Dict[str, Any]:
         """将当前对话转换为字典（用于API返回）"""
         return {
@@ -449,3 +448,156 @@ class ConversationStore:
     async def set_phase(self, phase: str) -> None:
         """设置当前阶段"""
         await self.update_info(phase=phase)
+
+     # ========== 阶段4：报告写作流程 ==========
+    
+    async def generate_report(self, topic: str):
+        """生成完整报告（规划→写作→审核）"""
+        # 1. 规划大纲
+        plan = await self._plan_outline(topic)
+        
+        # 2. 保存大纲到sections（作为草稿）
+        for i, title in enumerate(plan):
+            section = {
+                "id": f"sec-{i+1}",
+                "title": title,
+                "content": "",
+                "status": "draft",
+                "order": i+1
+            }
+            await self.add_section(section)
+        
+        # 3. 更新阶段为大纲待确认
+        self.state.phase = "reviewing_plan"
+        await self._save()
+        
+        # 4. 设置待确认问题
+        self.state.pending_question = "大纲已生成，您满意吗？"
+        self.state.pending_options = ["确认", "修改大纲"]
+        
+        return plan
+    
+    async def approve_plan(self):
+        """确认大纲，开始写作"""
+        self.state.phase = "writing"
+        self.state.pending_question = None
+        self.state.pending_options = []
+        await self._save()
+        
+        # 开始写第一段
+        await self._write_next_section()
+    
+    async def _write_next_section(self):
+        """写下一个未完成的段落"""
+        # 找到第一个draft状态的段落
+        for section in self.sections:
+            if section.status == "draft" and not section.content:
+                await self._write_section(section)
+                return
+        
+        # 所有段落都完成了
+        self.state.phase = "completed"
+        await self._save()
+    
+    async def _write_section(self, section):
+        """写单个段落（流式）"""
+        self.state.current_section_id = section.id
+        
+        # 构建提示词
+        prompt = f"请写报告的第{section.order}部分：{section.title}\n"
+        prompt += f"报告主题：{self.state.title}\n"
+        if self._get_confirmed_sections():
+            prompt += f"已完成的段落：{self._get_confirmed_sections()}"
+        
+        # 调用Agent流式生成
+        agent = get_agent()
+        messages = [{"role": "user", "content": prompt}]
+        
+        full_content = ""
+        async for chunk in agent.run(messages, stream=True):
+            if chunk.get("type") == "chunk":
+                full_content += chunk.get("content", "")
+                # 通过WebSocket推送流式内容（由控制器处理）
+                yield chunk
+        
+        # 更新段落内容
+        section.content = full_content
+        section.status = "draft"
+        self.state.phase = "reviewing_section"
+        self.state.pending_question = f"{section.title}完成，您满意吗？"
+        self.state.pending_options = ["确认", "修改", "重写"]
+        
+        await self._save()
+    
+    async def approve_section(self, section_id: str):
+        """确认段落"""
+        section = self._get_section(section_id)
+        section.status = "confirmed"
+        self.state.pending_question = None
+        self.state.pending_options = []
+        await self._save()
+        
+        # 继续写下一段
+        await self._write_next_section()
+    
+    async def edit_section(self, section_id: str, instruction: str):
+        """修改段落"""
+        section = self._get_section(section_id)
+        section.status = "editing"
+        self.state.edit_target_id = section_id
+        await self._save()
+        
+        # 调用Agent修改
+        prompt = f"请修改以下段落：\n{section.content}\n修改意见：{instruction}"
+        messages = [{"role": "user", "content": prompt}]
+        
+        agent = get_agent()
+        response = await agent.run(messages, stream=False)
+        
+        # 更新段落
+        section.content = response.get("content", "")
+        section.status = "draft"
+        section.version += 1
+        self.state.edit_target_id = None
+        
+        # 继续询问确认
+        self.state.pending_question = f"{section.title}修改完成，您满意吗？"
+        self.state.pending_options = ["确认", "再次修改"]
+        
+        await self._save()
+        
+        return section.content
+    
+    async def regenerate_section(self, section_id: str):
+        """重写段落"""
+        section = self._get_section(section_id)
+        section.content = ""
+        section.status = "draft"
+        await self._save()
+        
+        # 重新生成
+        await self._write_section(section)
+    
+    # ========== 辅助方法 ==========
+    
+    def _get_section(self, section_id: str):
+        """获取段落"""
+        for section in self.sections:
+            if section.id == section_id:
+                return section
+        return None
+    
+    def _get_confirmed_sections(self):
+        """获取已确认的段落内容"""
+        confirmed = []
+        for section in self.sections:
+            if section.status == "confirmed":
+                confirmed.append(f"## {section.title}\n{section.content}")
+        return "\n\n".join(confirmed)
+    
+    def _has_next_section(self):
+        """是否还有未写的段落"""
+        for section in self.sections:
+            if section.status == "draft" and not section.content:
+                return True
+        return False

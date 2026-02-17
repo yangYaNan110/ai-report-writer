@@ -1,9 +1,6 @@
 """
 WebSocket控制器 - 完整版本
-架构：每个对话一个 ConversationStore + 全局 Agent + 全局 DB
-特点：连接时加载历史、实时同步、内存缓存、action分发
-
-阶段3.4
+使用 EventType 模型进行事件分发
 """
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from typing import Dict, Optional
@@ -14,109 +11,87 @@ from datetime import datetime
 import uuid
 
 from store.conversation_store import ConversationStore
-from store.database import db  # 全局单例
+from store.database import db
 from agents.report_agent import ReportAgent
-from models.events import EventType
-from models.state import MessageRole
+from models.events import (
+    EventType, ClientEvent, ServerEvent,
+    StartEventData, MessageEventData, ApproveEventData,
+    EditSectionEventData, RegenerateEventData, PingEventData,
+    ChunkEventData, CompleteEventData, SyncEventData,
+    SectionReadyEventData, PromptEventData, InterruptEventData,
+    TaskProgressEventData, SectionUpdatedEventData,
+    ReportCompletedEventData, ErrorEventData, PongEventData
+)
 
-# 创建路由器
 router = APIRouter()
 
 # ==================== 全局 Agent 引用 ====================
 
-# 将由 main.py 在 lifespan 中设置
 _agent_instance: Optional[ReportAgent] = None
 
 def set_agent(agent: ReportAgent):
-    """设置全局 Agent 实例（在应用启动时调用）"""
     global _agent_instance
     _agent_instance = agent
     logger.info("🤖 WebSocket 控制器已获取 Agent 引用")
 
 def get_agent() -> ReportAgent:
-    """获取全局 Agent 实例"""
     if _agent_instance is None:
-        raise RuntimeError("Agent 未初始化，请检查应用启动顺序")
+        raise RuntimeError("Agent 未初始化")
     return _agent_instance
 
 # ==================== 活跃对话管理 ====================
 
-# 存储活跃的对话实例（每个对话一个 ConversationStore）
-# key: thread_id, value: ConversationStore 实例
 active_conversations: Dict[str, ConversationStore] = {}
 
 async def get_or_create_conversation(thread_id: str) -> ConversationStore:
-    """获取或创建对话实例
-    
-    每个对话独立实例，包含内存缓存
-    连接时加载：使用异步工厂方法创建，自动从数据库加载历史
-    """
     if thread_id not in active_conversations:
-        # 使用异步工厂方法创建（会自动加载历史）
         conv = await ConversationStore.create(db, thread_id)
         active_conversations[thread_id] = conv
         logger.info(f"📁 创建/加载对话实例: {thread_id}, 历史消息数: {len(conv.messages)}")
     else:
         conv = active_conversations[thread_id]
-        logger.debug(f"🔄 复用现有对话实例: {thread_id}")
     
     return conv
 
 def remove_conversation(thread_id: str):
-    """移除对话实例（连接断开时调用）"""
     if thread_id in active_conversations:
         del active_conversations[thread_id]
-        logger.info(f"📁 对话实例已移除: {thread_id}, 剩余活跃对话: {len(active_conversations)}")
+        logger.info(f"📁 对话实例已移除: {thread_id}")
 
 # ==================== WebSocket 主端点 ====================
 
 @router.websocket("/ws/{thread_id}")
 async def websocket_endpoint(websocket: WebSocket, thread_id: str):
-    """
-    WebSocket 主端点
-    
-    Args:
-        websocket: WebSocket连接
-        thread_id: 对话ID（客户端生成，用于区分不同对话）
-    """
     client_host = websocket.client.host if websocket.client else "unknown"
     logger.info(f"📨 WebSocket连接请求: {thread_id} 来自 {client_host}")
     
     try:
-        # 1. 获取或创建对话实例（连接时加载历史）
         conv = await get_or_create_conversation(thread_id)
-        
-        # 2. 接受WebSocket连接
         await websocket.accept()
         logger.info(f"✅ WebSocket连接成功: {thread_id}")
         
-        # 3. 发送连接成功消息和历史状态
+        # 发送同步状态
         await send_sync_state(websocket, thread_id, conv)
         
-        # 4. 消息处理循环
         while True:
-            # 接收客户端消息
             data = await websocket.receive_json()
             logger.debug(f"📥 收到消息 {thread_id}: {data.get('type')}")
             
-            # 处理消息
+            # 使用 EventType 进行分发
             await handle_websocket_message(websocket, thread_id, conv, data)
             
     except WebSocketDisconnect:
         logger.info(f"🔌 WebSocket断开连接: {thread_id}")
-        # 连接断开时移除实例（数据已实时存库，不需要额外操作）
         remove_conversation(thread_id)
-        
     except Exception as e:
         logger.error(f"❌ WebSocket错误 {thread_id}: {str(e)}")
-        # 发生错误时也移除实例
         remove_conversation(thread_id)
         try:
             await websocket.close(code=1011, reason=f"服务器错误: {str(e)}")
         except:
             pass
 
-# ==================== 消息分发 ====================
+# ==================== 消息分发（使用 EventType）====================
 
 async def handle_websocket_message(
     websocket: WebSocket,
@@ -124,13 +99,13 @@ async def handle_websocket_message(
     conv: ConversationStore,
     data: dict
 ):
-    """分发处理不同类型的消息"""
+    """使用 EventType 分发消息"""
     
     event_type = data.get("type")
     event_data = data.get("data", {})
     request_id = data.get("request_id")
     
-    # 根据事件类型分发
+    # 根据 EventType 分发
     if event_type == EventType.PING:
         await handle_ping(websocket, thread_id, event_data, request_id)
         
@@ -140,12 +115,21 @@ async def handle_websocket_message(
     elif event_type == EventType.MESSAGE:
         await handle_message(websocket, thread_id, conv, event_data, request_id)
         
+    elif event_type in [EventType.APPROVE, EventType.APPROVE_SECTION]:
+        # 兼容两种确认事件
+        await handle_approve(websocket, thread_id, conv, event_data, request_id)
+        
+    elif event_type == EventType.EDIT_SECTION:
+        await handle_edit_section(websocket, thread_id, conv, event_data, request_id)
+        
+    elif event_type == EventType.REGENERATE:
+        await handle_regenerate(websocket, thread_id, conv, event_data, request_id)
+        
     elif event_type == EventType.CANCEL:
         await handle_cancel(websocket, thread_id, conv, event_data, request_id)
         
     else:
-        # 未知事件类型
-        logger.warning(f"⚠️ 未知事件类型: {event_type} from {thread_id}")
+        logger.warning(f"⚠️ 未知事件类型: {event_type}")
         await send_error(
             websocket,
             thread_id,
@@ -154,7 +138,7 @@ async def handle_websocket_message(
             request_id=request_id
         )
 
-# ==================== 事件处理器 ====================
+# ==================== 事件处理器（使用 EventType 发送）====================
 
 async def handle_ping(
     websocket: WebSocket,
@@ -162,17 +146,20 @@ async def handle_ping(
     data: dict,
     request_id: Optional[str] = None
 ):
-    """处理心跳检测"""
-    await websocket.send_json({
-        "type": EventType.PONG,
-        "data": {
-            "timestamp": datetime.utcnow().isoformat(),
-            "echo": data
-        },
-        "request_id": request_id,
-        "timestamp": datetime.utcnow().isoformat()
-    })
+    """处理心跳"""
+    pong_data = PongEventData(
+        timestamp=datetime.utcnow().isoformat(),
+        echo=data
+    )
+    
+    await websocket.send_json(ServerEvent(
+        type=EventType.PONG,
+        data=pong_data.__dict__,
+        request_id=request_id
+    ).__dict__)
+    
     logger.debug(f"💓 心跳响应: {thread_id}")
+
 
 async def handle_start(
     websocket: WebSocket,
@@ -181,64 +168,46 @@ async def handle_start(
     data: dict,
     request_id: Optional[str] = None
 ):
-    """开始新对话（或重置现有对话）"""
+    """开始新对话"""
     try:
-        title = data.get("title", "新对话")
-        context = data.get("context", {})
+        start_data = StartEventData(
+            title=data.get("title"),
+            context=data.get("context")
+        )
         
-        # 检查是否是已有对话
         if conv.messages:
             # 已有对话，返回当前状态
-            logger.info(f"🔄 对话已存在: {thread_id}")
-            await websocket.send_json({
-                "type": EventType.SYNC,
-                "data": {
-                    "type": "state",
-                    "thread_id": thread_id,
-                    "title": conv.conversation.get("title", title),
-                    "phase": conv.get_phase(),
-                    "message_count": len(conv.messages),
-                    "section_count": len(conv.sections)
-                },
-                "request_id": request_id,
-                "timestamp": datetime.utcnow().isoformat()
-            })
+            await websocket.send_json(ServerEvent(
+                type=EventType.SYNC,
+                data=SyncEventData(
+                    type="state",
+                    thread_id=thread_id,
+                    phase=conv.get_phase(),
+                    title=conv.state.get("title", start_data.title),
+                    message_count=len(conv.messages),
+                    section_count=len(conv.sections)
+                ).__dict__,
+                request_id=request_id
+            ).__dict__)
         else:
-            # 新对话，更新标题
-            await conv.update_info(title=title, context=context)
+            # 新对话，生成报告
+            await conv.generate_report(start_data.title or "新对话")
             
-            # 添加系统消息
-            system_msg = {
-                "id": str(uuid.uuid4()),
-                "role": MessageRole.SYSTEM,
-                "content": "对话已开始",
-                "created_at": datetime.utcnow().isoformat(),
-                "metadata": {"event": "start"}
-            }
-            await conv.add_message(system_msg)
-            
-            logger.info(f"✅ 新对话创建成功: {thread_id} - {title}")
-            
-            await websocket.send_json({
-                "type": EventType.SYNC,
-                "data": {
-                    "type": "start_confirmed",
-                    "thread_id": thread_id,
-                    "title": title
-                },
-                "request_id": request_id,
-                "timestamp": datetime.utcnow().isoformat()
-            })
+            # 发送大纲确认提示
+            await websocket.send_json(ServerEvent(
+                type=EventType.PROMPT,
+                data=PromptEventData(
+                    question="大纲已生成，您满意吗？",
+                    options=["确认", "修改大纲"],
+                    context={"sections": conv.sections}
+                ).__dict__,
+                request_id=request_id
+            ).__dict__)
             
     except Exception as e:
-        logger.error(f"❌ 开始对话失败 {thread_id}: {str(e)}")
-        await send_error(
-            websocket,
-            thread_id,
-            code="START_FAILED",
-            message=f"开始对话失败: {str(e)}",
-            request_id=request_id
-        )
+        logger.error(f"❌ 开始对话失败: {e}")
+        await send_error(websocket, thread_id, "START_FAILED", str(e), request_id=request_id)
+
 
 async def handle_message(
     websocket: WebSocket,
@@ -249,52 +218,48 @@ async def handle_message(
 ):
     """处理用户消息"""
     try:
-        content = data.get("content", "").strip()
-        reply_to = data.get("reply_to")
+        msg_data = MessageEventData(
+            content=data.get("content", "").strip(),
+            reply_to=data.get("reply_to")
+        )
         
-        if not content:
+        if not msg_data.content:
             await send_error(
-                websocket,
-                thread_id,
-                code="EMPTY_MESSAGE",
-                message="消息内容不能为空",
+                websocket, thread_id,
+                "EMPTY_MESSAGE", "消息内容不能为空",
                 request_id=request_id
             )
             return
         
-        # 1. 保存用户消息（实时同步：内存+数据库）
+        # 保存用户消息
+        from models.state import MessageRole
         user_message = {
             "id": str(uuid.uuid4()),
             "role": MessageRole.USER,
-            "content": content,
-            "created_at": datetime.utcnow().isoformat(),
-            "metadata": {
-                "reply_to": reply_to
-            }
+            "content": msg_data.content,
+            "created_at": datetime.now().isoformat(),
+            "metadata": {"reply_to": msg_data.reply_to}
         }
         await conv.add_message(user_message)
         
-        # 2. 发送消息已接收确认
-        await websocket.send_json({
-            "type": EventType.SYNC,
-            "data": {
-                "type": "message_received",
-                "message_id": user_message["id"]
-            },
-            "request_id": request_id,
-            "timestamp": datetime.utcnow().isoformat()
-        })
+        # 发送已接收确认
+        await websocket.send_json(ServerEvent(
+            type=EventType.SYNC,
+            data=SyncEventData(
+                type="message_received",
+                message_id=user_message["id"]
+            ).__dict__,
+            request_id=request_id
+        ).__dict__)
         
-        # 3. 获取 Agent 并生成回复（流式）
+        # 获取Agent回复
         agent = get_agent()
-        
-        # 准备消息历史（从内存缓存获取）
         messages_for_agent = [
-            {"role": msg["role"], "content": msg["content"]}
-            for msg in conv.get_recent_messages(10)  # 最近10条，避免token超限
+            {"role": m["role"], "content": m["content"]}
+            for m in conv.get_recent_messages(10)
         ]
         
-        # 4. 流式生成回复
+        # 流式回复
         full_response = ""
         message_id = str(uuid.uuid4())
         
@@ -303,55 +268,176 @@ async def handle_message(
                 text = chunk.get("content", "")
                 full_response += text
                 
-                # 发送流式片段
-                await websocket.send_json({
-                    "type": EventType.CHUNK,
-                    "data": {
-                        "text": text,
-                        "done": False,
-                        "message_id": message_id
-                    },
-                    "request_id": request_id,
-                    "timestamp": datetime.utcnow().isoformat()
-                })
+                await websocket.send_json(ServerEvent(
+                    type=EventType.CHUNK,
+                    data=ChunkEventData(
+                        text=text,
+                        done=False,
+                        message_id=message_id
+                    ).__dict__,
+                    request_id=request_id
+                ).__dict__)
                 
             elif chunk.get("type") == "complete":
-                # 生成完成，保存 AI 回复（实时同步）
+                # 保存AI回复
                 assistant_message = {
                     "id": message_id,
                     "role": MessageRole.ASSISTANT,
                     "content": full_response,
                     "created_at": datetime.utcnow().isoformat(),
-                    "metadata": {
-                        "model": chunk.get("model", "unknown"),
-                        "tokens": chunk.get("tokens", 0)
-                    }
+                    "metadata": chunk.get("metadata", {})
                 }
                 await conv.add_message(assistant_message)
                 
-                # 发送完成事件
-                await websocket.send_json({
-                    "type": EventType.COMPLETE,
-                    "data": {
-                        "message_id": message_id,
-                        "full_content": full_response,
-                        "metadata": assistant_message["metadata"]
-                    },
-                    "request_id": request_id,
-                    "timestamp": datetime.utcnow().isoformat()
-                })
+                await websocket.send_json(ServerEvent(
+                    type=EventType.COMPLETE,
+                    data=CompleteEventData(
+                        message_id=message_id,
+                        full_content=full_response,
+                        metadata=assistant_message["metadata"]
+                    ).__dict__,
+                    request_id=request_id
+                ).__dict__)
                 
-                logger.info(f"✅ Agent回复完成 {thread_id}: {len(full_response)}字符")
+    except Exception as e:
+        logger.error(f"❌ 处理消息失败: {e}")
+        await send_error(websocket, thread_id, "MESSAGE_ERROR", str(e), request_id=request_id)
+
+
+async def handle_approve(
+    websocket: WebSocket,
+    thread_id: str,
+    conv: ConversationStore,
+    data: dict,
+    request_id: Optional[str] = None
+):
+    """处理确认（大纲或段落）"""
+    try:
+        approve_data = ApproveEventData(
+            section_id=data.get("section_id"),
+            feedback=data.get("feedback")
+        )
+        
+        if approve_data.section_id:
+            # 确认段落
+            await conv.approve_section(approve_data.section_id)
+            
+            # 检查是否所有段落都完成了
+            if conv.state.phase == "completed":
+                await websocket.send_json(ServerEvent(
+                    type=EventType.REPORT_COMPLETED,
+                    data=ReportCompletedEventData(
+                        total_sections=len(conv.sections),
+                        total_words=sum(len(s.content) for s in conv.sections)
+                    ).__dict__,
+                    request_id=request_id
+                ).__dict__)
+            else:
+                # 继续下一段
+                await websocket.send_json(ServerEvent(
+                    type=EventType.STATE_CHANGE,
+                    data={"phase": conv.state.phase, "current_section": conv.state.current_section_id},
+                    request_id=request_id
+                ).__dict__)
+        else:
+            # 确认大纲
+            await conv.approve_plan()
+            
+    except Exception as e:
+        await send_error(websocket, thread_id, "APPROVE_ERROR", str(e), request_id=request_id)
+
+
+async def handle_edit_section(
+    websocket: WebSocket,
+    thread_id: str,
+    conv: ConversationStore,
+    data: dict,
+    request_id: Optional[str] = None
+):
+    """处理修改段落"""
+    try:
+        edit_data = EditSectionEventData(
+            section_id=data.get("section_id"),
+            instruction=data.get("instruction", "")
+        )
+        
+        if not edit_data.section_id:
+            await send_error(websocket, thread_id, "INVALID_REQUEST", "缺少section_id", request_id=request_id)
+            return
+        
+        # 执行修改
+        new_content = await conv.edit_section(edit_data.section_id, edit_data.instruction)
+        section = conv._get_section(edit_data.section_id)
+        
+        # 发送更新后的段落
+        await websocket.send_json(ServerEvent(
+            type=EventType.SECTION_UPDATED,
+            data=SectionUpdatedEventData(
+                section_id=edit_data.section_id,
+                content=new_content,
+                version=section.version,
+                status=section.status
+            ).__dict__,
+            request_id=request_id
+        ).__dict__)
+        
+        # 询问是否满意
+        await websocket.send_json(ServerEvent(
+            type=EventType.PROMPT,
+            data=PromptEventData(
+                question=f"{section.title}修改完成，您满意吗？",
+                options=["确认", "再次修改"]
+            ).__dict__,
+            request_id=request_id
+        ).__dict__)
         
     except Exception as e:
-        logger.error(f"❌ 处理消息失败 {thread_id}: {str(e)}")
-        await send_error(
-            websocket,
-            thread_id,
-            code="MESSAGE_HANDLING_FAILED",
-            message=f"处理消息失败: {str(e)}",
-            request_id=request_id
+        await send_error(websocket, thread_id, "EDIT_ERROR", str(e), request_id=request_id)
+
+
+async def handle_regenerate(
+    websocket: WebSocket,
+    thread_id: str,
+    conv: ConversationStore,
+    data: dict,
+    request_id: Optional[str] = None
+):
+    """处理重写段落"""
+    try:
+        regen_data = RegenerateEventData(
+            section_id=data.get("section_id")
         )
+        
+        if not regen_data.section_id:
+            await send_error(websocket, thread_id, "INVALID_REQUEST", "缺少section_id", request_id=request_id)
+            return
+        
+        # 流式重写
+        async for chunk in conv.regenerate_section(regen_data.section_id):
+            await websocket.send_json(ServerEvent(
+                type=EventType.CHUNK,
+                data=ChunkEventData(
+                    text=chunk.get("content", ""),
+                    section_id=regen_data.section_id,
+                    done=chunk.get("done", False)
+                ).__dict__,
+                request_id=request_id
+            ).__dict__)
+        
+        # 完成后询问
+        section = conv._get_section(regen_data.section_id)
+        await websocket.send_json(ServerEvent(
+            type=EventType.PROMPT,
+            data=PromptEventData(
+                question=f"{section.title}重写完成，您满意吗？",
+                options=["确认", "再次修改"]
+            ).__dict__,
+            request_id=request_id
+        ).__dict__)
+        
+    except Exception as e:
+        await send_error(websocket, thread_id, "REGENERATE_ERROR", str(e), request_id=request_id)
+
 
 async def handle_cancel(
     websocket: WebSocket,
@@ -360,61 +446,60 @@ async def handle_cancel(
     data: dict,
     request_id: Optional[str] = None
 ):
-    """取消当前操作"""
+    """处理取消"""
     # TODO: 阶段5实现真正的取消逻辑
-    await websocket.send_json({
-        "type": EventType.SYNC,
-        "data": {
-            "type": "cancel_not_implemented",
-            "message": "取消功能正在开发中"
-        },
-        "request_id": request_id,
-        "timestamp": datetime.utcnow().isoformat()
-    })
+    await websocket.send_json(ServerEvent(
+        type=EventType.SYNC,
+        data=SyncEventData(
+            type="cancel_not_implemented",
+            message="取消功能正在开发中"
+        ).__dict__,
+        request_id=request_id
+    ).__dict__)
+
 
 # ==================== 辅助函数 ====================
 
 async def send_sync_state(websocket: WebSocket, thread_id: str, conv: ConversationStore):
-    """发送同步状态（连接时调用）"""
+    """发送同步状态"""
     
-    # 1. 发送连接成功
-    await websocket.send_json({
-        "type": EventType.SYNC,
-        "data": {
-            "type": "connected",
-            "thread_id": thread_id,
-            "message": "连接成功"
-        },
-        "timestamp": datetime.utcnow().isoformat()
-    })
+    # 1. 连接成功
+    await websocket.send_json(ServerEvent(
+        type=EventType.SYNC,
+        data=SyncEventData(
+            type="connected",
+            thread_id=thread_id,
+            message="连接成功"
+        ).__dict__
+    ).__dict__)
     
-    # 2. 如果有历史消息，发送历史
+    # 2. 历史消息
     if conv.messages:
-        # 发送最近10条消息作为历史
-        recent_messages = conv.get_recent_messages(10)
-        await websocket.send_json({
-            "type": EventType.SYNC,
-            "data": {
-                "type": "history",
-                "messages": recent_messages,
-                "total": len(conv.messages),
-                "shown": len(recent_messages)
-            },
-            "timestamp": datetime.utcnow().isoformat()
-        })
+        recent = conv.get_recent_messages(10)
+        await websocket.send_json(ServerEvent(
+            type=EventType.SYNC,
+            data=SyncEventData(
+                type="history",
+                messages=recent,
+                total=len(conv.messages),
+                shown=len(recent)
+            ).__dict__
+        ).__dict__)
     
-    # 3. 发送当前状态
-    await websocket.send_json({
-        "type": EventType.SYNC,
-        "data": {
-            "type": "state",
-            "thread_id": thread_id,
-            "phase": conv.get_phase(),
-            "title": conv.conversation.get("title", "新对话"),
-            "sections": conv.get_sections()
-        },
-        "timestamp": datetime.utcnow().isoformat()
-    })
+    # 3. 当前状态
+    await websocket.send_json(ServerEvent(
+        type=EventType.SYNC,
+        data=SyncEventData(
+            type="state",
+            thread_id=thread_id,
+            phase=conv.get_phase(),
+            title=conv.state.get("title", "新对话"),
+            sections=conv.sections,
+            pending_question=conv.state.get("pending_question"),
+            pending_options=conv.state.get("pending_options")
+        ).__dict__
+    ).__dict__)
+
 
 async def send_error(
     websocket: WebSocket,
@@ -424,32 +509,31 @@ async def send_error(
     details: dict = None,
     request_id: Optional[str] = None
 ):
-    """发送错误消息"""
-    await websocket.send_json({
-        "type": EventType.ERROR,
-        "data": {
-            "code": code,
-            "message": message,
-            "details": details or {}
-        },
-        "request_id": request_id,
-        "timestamp": datetime.utcnow().isoformat()
-    })
+    """发送错误"""
+    await websocket.send_json(ServerEvent(
+        type=EventType.ERROR,
+        data=ErrorEventData(
+            code=code,
+            message=message,
+            details=details
+        ).__dict__,
+        request_id=request_id
+    ).__dict__)
+
 
 # ==================== 状态查询接口 ====================
 
 @router.get("/ws/status")
 async def websocket_status():
-    """获取WebSocket连接状态（用于监控）"""
     return {
         "active_conversations": len(active_conversations),
         "threads": list(active_conversations.keys()),
         "agent_ready": _agent_instance is not None
     }
 
+
 @router.get("/ws/conversation/{thread_id}")
 async def get_conversation_info(thread_id: str):
-    """获取指定对话的信息（不通过WebSocket）"""
     if thread_id in active_conversations:
         conv = active_conversations[thread_id]
         return {
@@ -458,16 +542,11 @@ async def get_conversation_info(thread_id: str):
             "message_count": len(conv.messages),
             "section_count": len(conv.sections),
             "phase": conv.get_phase(),
-            "title": conv.conversation.get("title")
+            "title": conv.state.get("title")
         }
     else:
-        # 从数据库查询
         info = await db.get_conversation(thread_id)
         if info:
-            return {
-                "thread_id": thread_id,
-                "active": False,
-                **info
-            }
+            return {"thread_id": thread_id, "active": False, **info}
         else:
             return {"thread_id": thread_id, "active": False, "exists": False}
