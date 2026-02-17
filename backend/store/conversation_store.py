@@ -25,6 +25,19 @@ class ConversationStore:
     - 读操作：直接从内存返回（快）
     - 写操作：同时更新内存和数据库（实时同步）
     - 初始化：从数据库加载到内存（连接时加载）
+
+    已有的基础方法
+    - add_message()        # 存消息
+    - get_messages()       # 取消息  
+    - add_section()        # 存段落
+    - update_info()        # 更新状态
+    - get_phase()          # 获取当前阶段
+    - set_phase()          # 设置阶段
+    - generate_report() - 生成完整报告
+    - approve_section() - 确认段落
+    - edit_section() - 修改段落
+    - regenerate_section() - 重写段落
+    - get_writing_progress() - 获取写作进度
     """
     @classmethod
     async def create(cls, db: Database, thread_id: str):
