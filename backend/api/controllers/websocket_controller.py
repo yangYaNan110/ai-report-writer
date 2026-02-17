@@ -1,7 +1,7 @@
 """
 WebSocket控制器 - 完整版本
 架构：每个对话一个 ConversationStore + 全局 Agent + 全局 DB
-特点：连接时加载历史、实时同步数据库、内存缓存
+特点：连接时加载历史、实时同步、内存缓存
 
 阶段3.4
 """
@@ -49,10 +49,10 @@ async def get_or_create_conversation(thread_id: str) -> ConversationStore:
     """获取或创建对话实例
     
     每个对话独立实例，包含内存缓存
-    连接时加载：创建实例时会自动从数据库加载历史
+    连接时加载：使用异步工厂方法创建，自动从数据库加载历史
     """
     if thread_id not in active_conversations:
-        # 创建新实例（会自动从数据库加载历史）
+        # 使用异步工厂方法创建（会自动加载历史）
         conv = await ConversationStore.create(db, thread_id)
         active_conversations[thread_id] = conv
         logger.info(f"📁 创建/加载对话实例: {thread_id}, 历史消息数: {len(conv.messages)}")
@@ -90,7 +90,7 @@ async def websocket_endpoint(websocket: WebSocket, thread_id: str):
         await websocket.accept()
         logger.info(f"✅ WebSocket连接成功: {thread_id}")
         
-        # 3. 发送连接成功消息
+        # 3. 发送连接成功消息和历史状态
         await send_sync_state(websocket, thread_id, conv)
         
         # 4. 消息处理循环
@@ -195,8 +195,8 @@ async def handle_start(
                 "data": {
                     "type": "state",
                     "thread_id": thread_id,
-                    "title": conv.info.get("title", title),
-                    "phase": conv.info.get("phase", "planning"),
+                    "title": conv.conversation.get("title", title),
+                    "phase": conv.get_phase(),
                     "message_count": len(conv.messages),
                     "section_count": len(conv.sections)
                 },
@@ -204,14 +204,8 @@ async def handle_start(
                 "timestamp": datetime.utcnow().isoformat()
             })
         else:
-            # 新对话，创建记录
-            conv.info["title"] = title
-            conv.info["phase"] = "planning"
-            conv.info["created_at"] = datetime.utcnow()
-            conv.info["updated_at"] = datetime.utcnow()
-            
-            # 保存到数据库
-            await db.save_conversation_info(thread_id, conv.info)
+            # 新对话，更新标题
+            await conv.update_info(title=title, context=context)
             
             # 添加系统消息
             system_msg = {
@@ -297,7 +291,7 @@ async def handle_message(
         # 准备消息历史（从内存缓存获取）
         messages_for_agent = [
             {"role": msg["role"], "content": msg["content"]}
-            for msg in conv.messages[-10:]  # 最近10条，避免token超限
+            for msg in conv.get_recent_messages(10)  # 最近10条，避免token超限
         ]
         
         # 4. 流式生成回复
@@ -397,7 +391,7 @@ async def send_sync_state(websocket: WebSocket, thread_id: str, conv: Conversati
     # 2. 如果有历史消息，发送历史
     if conv.messages:
         # 发送最近10条消息作为历史
-        recent_messages = conv.messages[-10:]
+        recent_messages = conv.get_recent_messages(10)
         await websocket.send_json({
             "type": EventType.SYNC,
             "data": {
@@ -415,9 +409,9 @@ async def send_sync_state(websocket: WebSocket, thread_id: str, conv: Conversati
         "data": {
             "type": "state",
             "thread_id": thread_id,
-            "phase": conv.info.get("phase", "planning"),
-            "title": conv.info.get("title", "新对话"),
-            "sections": conv.sections
+            "phase": conv.get_phase(),
+            "title": conv.conversation.get("title", "新对话"),
+            "sections": conv.get_sections()
         },
         "timestamp": datetime.utcnow().isoformat()
     })
@@ -463,12 +457,12 @@ async def get_conversation_info(thread_id: str):
             "active": True,
             "message_count": len(conv.messages),
             "section_count": len(conv.sections),
-            "phase": conv.info.get("phase"),
-            "title": conv.info.get("title")
+            "phase": conv.get_phase(),
+            "title": conv.conversation.get("title")
         }
     else:
         # 从数据库查询
-        info = await db.get_conversation_info(thread_id)
+        info = await db.get_conversation(thread_id)
         if info:
             return {
                 "thread_id": thread_id,
