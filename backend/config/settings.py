@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     PORT: int = Field(default=8000, env="PORT")
     
     # 数据库配置
+    REBUILD_DB: bool = Field(default=False, env="REBUILD_DB")  # 是否重建数据库表（开发用）
     DATABASE_URL: str = Field(
         default="sqlite:///data/conversations.db", 
         env="DATABASE_URL"

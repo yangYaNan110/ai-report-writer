@@ -8,6 +8,7 @@ import json
 from typing import Optional, Any, Dict, List, Tuple
 import os
 from datetime import datetime
+from config.settings import settings
 
 # 数据库文件路径
 DB_PATH = os.path.join(os.path.dirname(__file__), '..', 'data', 'conversations.db')
@@ -118,9 +119,12 @@ class Database:
         print("🔄 重建数据库表结构...")
         
         # 删除旧表（注意顺序，因为有外键约束）
-        await self.execute("DROP TABLE IF EXISTS sections")
-        await self.execute("DROP TABLE IF EXISTS messages")
-        await self.execute("DROP TABLE IF EXISTS conversations")
+        # 只在开发环境且明确指定时才重建
+        rebuild = settings.REBUILD_DB
+        if rebuild:
+            await self.execute("DROP TABLE IF EXISTS sections")
+            await self.execute("DROP TABLE IF EXISTS messages")
+            await self.execute("DROP TABLE IF EXISTS conversations")
         
         # 创建conversations表
         await self.execute("""

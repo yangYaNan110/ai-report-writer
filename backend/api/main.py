@@ -82,9 +82,8 @@ async def root():
     return {
         "service": "AI Report Writing System",
         "status": "running",
-        "version": "0.1.0",
+        "version": "1.0.0",
         "database": "sqlite",
-        "websocket": "ws://localhost:8000/ws/{client_id}"
     }
 
 @app.get("/health")
