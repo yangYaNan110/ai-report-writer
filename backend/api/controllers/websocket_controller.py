@@ -15,7 +15,7 @@ import uuid
 
 from store.conversation_store import ConversationStore
 from store.database import db  # 全局单例
-from graph.agents.report_agent import ReportAgent
+from agents.report_agent import ReportAgent
 from models.events import EventType
 from models.state import MessageRole
 

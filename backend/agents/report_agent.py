@@ -110,9 +110,9 @@ class ReportAgent:
         """
         try:
             # 计算skills目录路径
-            # 当前文件在: graph/agents/report_agent.py
-            # 项目根目录: graph/agents/../../ (即项目根目录)
-            current_file = Path(__file__).resolve()  # graph/agents/report_agent.py
+            # 当前文件在: agents/report_agent.py
+            # 项目根目录: agents/../../ (即项目根目录)
+            current_file = Path(__file__).resolve()  # agents/report_agent.py
             project_root = current_file.parent.parent.parent  # 项目根目录
             skills_dir = project_root / "skills"
             

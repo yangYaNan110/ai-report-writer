@@ -1,7 +1,7 @@
 # store/utils.py
 """
 store层内部使用的工具函数
-注意：如果被其他层（api/、graph/）调用，请迁移到根目录 utils/
+注意：如果被其他层（api/）调用，请迁移到根目录 utils/
 """
 import json
 from datetime import datetime

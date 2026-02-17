@@ -14,7 +14,7 @@ from loguru import logger
 from store.database import db, init_db, get_db
 from config.settings import settings
 from api.controllers import websocket_controller  # 导入WebSocket控制器（阶段1.2）
-from graph.agents.report_agent import ReportAgent  # 导入ReportAgent
+from agents.report_agent import ReportAgent  # 导入ReportAgent
 #配置日志   
 logger.add("logs/app.log", rotation="500 MB", retention="10 days")
 # 全局 Agent 实例
