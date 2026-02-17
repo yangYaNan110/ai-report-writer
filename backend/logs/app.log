@@ -2920,3 +2920,7 @@
 2026-02-17 11:03:13.922 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:58 - 📁 创建/加载对话实例: test-123, 历史消息数: 3
 2026-02-17 11:03:13.922 | INFO     | api.controllers.websocket_controller:websocket_endpoint:91 - ✅ WebSocket连接成功: test-123
 2026-02-17 11:03:13.922 | INFO     | api.controllers.websocket_controller:websocket_endpoint:91 - ✅ WebSocket连接成功: test-123
+2026-02-17 11:03:51.023 | INFO     | api.controllers.websocket_controller:websocket_endpoint:106 - 🔌 WebSocket断开连接: test-123
+2026-02-17 11:03:51.023 | INFO     | api.controllers.websocket_controller:websocket_endpoint:106 - 🔌 WebSocket断开连接: test-123
+2026-02-17 11:03:51.024 | INFO     | api.controllers.websocket_controller:remove_conversation:69 - 📁 对话实例已移除: test-123, 剩余活跃对话: 0
+2026-02-17 11:03:51.024 | INFO     | api.controllers.websocket_controller:remove_conversation:69 - 📁 对话实例已移除: test-123, 剩余活跃对话: 0
