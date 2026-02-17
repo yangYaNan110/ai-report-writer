@@ -9,6 +9,9 @@ from typing import Optional, Any, Dict, List, Tuple
 import os
 from datetime import datetime
 from config.settings import settings
+from datetime import datetime, timezone  # 确保导入 timezone
+import uuid
+
 
 # 数据库文件路径
 DB_PATH = os.path.join(os.path.dirname(__file__), '..', 'data', 'conversations.db')
@@ -27,6 +30,7 @@ class Database:
     def __init__(self, db_path: str = DB_PATH):
         self.db_path = db_path
         self.connection: Optional[aiosqlite.Connection] = None
+        self.connection_id = str(uuid.uuid4())[:8]  # 添加连接ID
     
     async def connect(self):
         """建立数据库连接"""
@@ -54,8 +58,14 @@ class Database:
         """执行SQL语句（不返回结果）"""
         if not self.connection:
             await self.connect()
+        
+        print(f"📝 [连接 {self.connection_id}] 执行SQL: {sql[:60]}...")
+        print(f"   参数: {params}")
         cursor = await self.connection.execute(sql, params)
+
+        print(f"   执行完成，准备commit...")  # 添加这行
         await self.connection.commit()
+        print(f"   ✅ commit完成")  # 添加这行
         return cursor
     
     async def fetch_one(self, sql: str, params: tuple = ()) -> Optional[dict]:
@@ -120,11 +130,11 @@ class Database:
         
         # 删除旧表（注意顺序，因为有外键约束）
         # 只在开发环境且明确指定时才重建
-        rebuild = settings.REBUILD_DB
-        if rebuild:
-            await self.execute("DROP TABLE IF EXISTS sections")
-            await self.execute("DROP TABLE IF EXISTS messages")
-            await self.execute("DROP TABLE IF EXISTS conversations")
+        # rebuild = settings.REBUILD_DB
+        # if rebuild:
+        #     await self.execute("DROP TABLE IF EXISTS sections")
+        #     await self.execute("DROP TABLE IF EXISTS messages")
+        #     await self.execute("DROP TABLE IF EXISTS conversations")
         
         # 创建conversations表
         await self.execute("""
@@ -212,21 +222,46 @@ class Database:
     
     async def save_conversation_info(self, thread_id: str, info: Dict[str, Any]) -> None:
         """保存对话基本信息（INSERT OR REPLACE）"""
-        query = """
-        INSERT OR REPLACE INTO conversations (id, title, phase, context, created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?)
-        """
-        await self.execute(
-            query,
-            [
-                thread_id,
-                info.get('title', '新对话'),
-                info.get('phase', 'planning'),
-                json.dumps(info.get('context', {}), default=json_serializer),
-                info.get('created_at', datetime.utcnow()),
-                info.get('updated_at', datetime.utcnow())
-            ]
+        # 先检查是否存在
+        existing = await self.fetch_one(
+            "SELECT id FROM conversations WHERE id = ?",
+            (thread_id,)
         )
+        
+        if existing:
+            # 存在则更新
+            query = """
+            UPDATE conversations 
+            SET title = ?, phase = ?, context = ?, updated_at = ?
+            WHERE id = ?
+            """
+            await self.execute(
+                query,
+                (
+                    info.get('title', '新对话'),
+                    info.get('phase', 'planning'),
+                    json.dumps(info.get('context', {}), default=json_serializer),
+                    info.get('updated_at', datetime.now(timezone.utc)),
+                    thread_id
+                )
+            )
+        else:
+            # 不存在则插入
+            query = """
+            INSERT INTO conversations (id, title, phase, context, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """
+            await self.execute(
+                query,
+                (
+                    thread_id,
+                    info.get('title', '新对话'),
+                    info.get('phase', 'planning'),
+                    json.dumps(info.get('context', {}), default=json_serializer),
+                    info.get('created_at', datetime.now(timezone.utc)),
+                    info.get('updated_at', datetime.now(timezone.utc))
+                )
+            )
     
     async def update_conversation(self, thread_id: str, updates: Dict[str, Any]) -> None:
         """更新对话信息"""
@@ -247,7 +282,7 @@ class Database:
             return
             
         sets.append("updated_at = ?")
-        values.append(datetime.utcnow())
+        values.append(datetime.now(timezone.utc))
         values.append(thread_id)
         
         query = f"UPDATE conversations SET {', '.join(sets)} WHERE id = ?"
@@ -292,22 +327,107 @@ class Database:
     
     async def save_message(self, thread_id: str, message: Dict[str, Any]) -> None:
         """保存单条消息"""
-        query = """
-        INSERT INTO messages (id, conversation_id, role, content, created_at, metadata)
-        VALUES (?, ?, ?, ?, ?, ?)
-        """
-        await self.execute(
-            query,
-            [
-                message['id'],
-                thread_id,
-                message['role'],
-                message['content'],
-                message.get('created_at', datetime.utcnow()),
-                json.dumps(message.get('metadata', {}), default=json_serializer)
-            ]
+        print(f"\n🔵 [DEBUG] save_message 被调用")
+        print(f"   thread_id: {thread_id}")
+        print(f"   message id: {message['id']}")
+        print(f"   message role: {message['role']}")
+        print(f"   message content: {message['content'][:30]}...")
+        print(f"\n🔵 [DEBUG] save_message 被调用 [连接 {self.connection_id}]")
+        print("=" * 30)
+        # //test-123
+        # //b664cbe4-84a2-4bcd-94fb-c7a23af92d62
+        # //连接 1d450c2a
+
+        # thread_id: test-123
+        # message id: adaab7ef-3a79-4835-8f84-0361b9ea76b0
+
+        # 处理 datetime：转换为 ISO 格式字符串
+        created_at = message.get('created_at', datetime.now(timezone.utc))
+        print(f"   created_at 类型: {type(created_at)}")
+        print(f"   created_at 值: {created_at}")
+
+        # 检查所有参数类型
+        params = [
+            message['id'],
+            thread_id,
+            message['role'],
+            message['content'],
+            created_at,
+            json.dumps(message.get('metadata', {}), default=json_serializer)
+        ]
+        print(f"   所有参数类型: {[type(p) for p in params]}")
+
+
+        if isinstance(created_at, datetime):
+            created_at = created_at.isoformat()
+        # 先检查当前有多少条消息
+        before_count = await self.fetch_one(
+            "SELECT COUNT(*) as count FROM messages WHERE conversation_id = ?",
+            [thread_id]
         )
-    
+        print(f"   保存前消息数: {before_count['count'] if before_count else 0}")
+      
+        
+        try:
+            query = """
+            INSERT INTO messages (id, conversation_id, role, content, created_at, metadata)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """
+            await self.execute(
+                query,
+                [
+                    message['id'],
+                    thread_id,
+                    message['role'],
+                    message['content'],
+                    message.get('created_at', datetime.now(timezone.utc)),
+                    json.dumps(message.get('metadata', {}), default=json_serializer)
+                ]
+            )
+            print(f"   ✅ INSERT 成功")
+
+            # 添加这些行（强制同步并验证）
+            print(f"   强制checkpoint...")
+            await self.connection.execute("PRAGMA wal_checkpoint")
+            
+            print(f"   立即验证...")
+            verification = await self.fetch_one(
+                "SELECT * FROM messages WHERE id = ?",
+                (message['id'],)
+            )
+            if verification:
+                print(f"   ✅ 验证成功：消息在数据库中！content: {verification['content'][:30]}...")
+            else:
+                print(f"   ❌ 验证失败：消息不在数据库中！")
+        except Exception as e:
+            print(f"   ❌ INSERT 失败: {e}")
+            # 如果失败，尝试 UPDATE
+            try:
+                query = """
+                UPDATE messages 
+                SET role=?, content=?, created_at=?, metadata=?
+                WHERE id = ?
+                """
+                await self.execute(
+                    query,
+                    [
+                        message['role'],
+                        message['content'],
+                        message.get('created_at', datetime.now(timezone.utc)),
+                        json.dumps(message.get('metadata', {}), default=json_serializer),
+                        message['id']
+                    ]
+                )
+                print(f"   ✅ UPDATE 成功")
+            except Exception as e2:
+                print(f"   ❌ UPDATE 也失败: {e2}")
+        
+        # 验证保存后的数量
+        after_count = await self.fetch_one(
+            "SELECT COUNT(*) as count FROM messages WHERE conversation_id = ?",
+            [thread_id]
+        )
+        print(f"   保存后消息数: {after_count['count'] if after_count else 0}")
     async def save_messages(self, thread_id: str, messages: List[Dict[str, Any]]) -> None:
         """批量保存消息"""
         if not messages:
@@ -324,7 +444,7 @@ class Database:
                 thread_id,
                 msg['role'],
                 msg['content'],
-                msg.get('created_at', datetime.utcnow()),
+                msg.get('created_at', datetime.now(timezone.utc)),
                 json.dumps(msg.get('metadata', {}), default=json_serializer)
             ))
         
@@ -379,8 +499,8 @@ class Database:
                 section['content'],
                 section.get('status', 'draft'),
                 section.get('order', 0),
-                section.get('created_at', datetime.utcnow()),
-                section.get('updated_at', datetime.utcnow()),
+                section.get('created_at', datetime.now(timezone.utc)),
+                section.get('updated_at', datetime.now(timezone.utc)),
                 json.dumps(section.get('comments', []), default=json_serializer)
             ]
         )
@@ -406,8 +526,8 @@ class Database:
                 sec['content'],
                 sec.get('status', 'draft'),
                 sec.get('order', 0),
-                sec.get('created_at', datetime.utcnow()),
-                sec.get('updated_at', datetime.utcnow()),
+                sec.get('created_at', datetime.now(timezone.utc)),
+                sec.get('updated_at', datetime.now(timezone.utc)),
                 json.dumps(sec.get('comments', []), default=json_serializer)
             ))
         
@@ -432,7 +552,7 @@ class Database:
             return
             
         sets.append("updated_at = ?")
-        values.append(datetime.utcnow())
+        values.append(datetime.now(timezone.utc))
         values.append(section_id)
         
         query = f"UPDATE sections SET {', '.join(sets)} WHERE id = ?"

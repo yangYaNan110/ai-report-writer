@@ -1,487 +1,248 @@
-# store/conversation_store.py
 """
-对话存储类 - 每个对话一个实例
-负责单个对话的CRUD操作，包含内存缓存
-特点：连接时加载、实时同步、内存缓存读操作
+对话存储类 - 每个对话一个独立实例
+使用纯数据模型，包含内存缓存和业务逻辑
 """
 from typing import Optional, List, Dict, Any
-from datetime import datetime
+from datetime import datetime,timezone
 import json
 import uuid
 
 from store.database import Database
-from store.utils import json_serializer, now
+from store.utils import json_serializer
+from models.state import (
+    Conversation, Message, Section,
+    Phase, SectionStatus, MessageRole
+)
 
 
 class ConversationStore:
-    """对话存储类 - 每个对话独立实例
+    """对话存储类 - 每个对话独立实例"""
     
-    每个对话一个实例，包含内存缓存：
-    - messages: 内存中的消息列表
-    - sections: 内存中的段落列表
-    - conversation: 对话基本信息
-    
-    读写策略：
-    - 读操作：直接从内存返回（快）
-    - 写操作：同时更新内存和数据库（实时同步）
-    - 初始化：从数据库加载到内存（连接时加载）
-
-    已有的基础方法
-    - add_message()        # 存消息
-    - get_messages()       # 取消息  
-    - add_section()        # 存段落
-    - update_info()        # 更新状态
-    - get_phase()          # 获取当前阶段
-    - set_phase()          # 设置阶段
-    阶段4：报告写作流程新增方法：
-    - generate_report() - 生成完整报告
-    - approve_section() - 确认段落
-    - edit_section() - 修改段落
-    - regenerate_section()   # 重写段落
-
-    规划阶段新增方法：
-    - get_writing_progress() - 获取写作进度
-    """
     @classmethod
     async def create(cls, db: Database, thread_id: str):
-        """异步工厂方法：创建实例并加载数据
-        
-        Args:
-            db: 数据库全局单例
-            thread_id: 对话ID
-            
-        Returns:
-            已加载数据的 ConversationStore 实例
-        """
+        """异步工厂方法：创建实例并加载数据"""
         instance = cls(db, thread_id)
-        await instance.load()  # 调用 load 方法加载数据
+        await instance._load_from_db()
         return instance
     
-    
     def __init__(self, db: Database, thread_id: str):
-        """初始化对话实例
-        
-        Args:
-            db: 数据库全局单例
-            thread_id: 对话ID（对应WebSocket的thread_id）
-        """
         self.db = db
         self.thread_id = thread_id
-        
-        # 内存缓存
-        self.messages: List[Dict[str, Any]] = []
-        self.sections: List[Dict[str, Any]] = []
-        self.conversation: Dict[str, Any] = {}
-        
-        # 初始化时从数据库加载
-        # 注意：不能在这里直接 await，需要在外部调用
-        # 所以改为由调用者显式调用 load()
-        # self._load_from_db()
-        
-    async def load(self):
-        """显式加载数据（需要在创建后调用）"""
-        await self._load_from_db()
-        return self
-    # ==================== 私有加载方法 ====================
-
+        self.conversation: Optional[Conversation] = None
+    
+    # ==================== 私有加载和保存方法 ====================
+    
     async def _load_from_db(self):
-        """从数据库加载数据到内存（连接时调用）"""
+        """从数据库加载数据到内存"""
+        print(f"\n📚 [ConversationStore._load_from_db] 开始加载对话 {self.thread_id}")
+        
         # 1. 加载对话基本信息
-        conv_data = await self.db.get_conversation(self.thread_id)  # 加 await
-        print(f"   get_conversation 返回: {conv_data}")
+        conv_data = await self.db.get_conversation(self.thread_id)
+        
         if conv_data:
-            self.conversation = conv_data
-            print(f"   找到现有对话: {self.thread_id}")
+            self.conversation = Conversation.from_dict(conv_data)
+            print(f"   ✅ 找到现有对话: {self.thread_id}")
         else:
-            print(f"   没有找到对话，创建新对话: {self.thread_id}")
-            # 新对话，创建默认信息
-            self.conversation = {
-                "id": self.thread_id,
-                "title": "新对话",
-                "phase": "planning",
-                "context": {},
-                "created_at": datetime.now(),
-                "updated_at": datetime.now()
-            }
-             # 保存到数据库，确保后续外键约束通过
-            try:
-                await self.db.save_conversation_info(self.thread_id, self.conversation)
-                print(f"📁 创建新对话记录: {self.thread_id}")
-            except Exception as e:
-                print(f"❌ 保存新对话记录失败: {e}")
+            # 创建新对话
+            self.conversation = Conversation(
+                id=self.thread_id,
+                title="新对话",
+                phase=Phase.PLANNING,
+                created_at=datetime.now(timezone.utc),
+                updated_at=datetime.now(timezone.utc),
+                messages=[],
+                sections=[],
+                context={}
+            )
+            # 保存到数据库
+            await self.db.save_conversation_info(self.thread_id, self.conversation.to_dict())
+            print(f"   📁 创建新对话: {self.thread_id}")
         
         # 2. 加载消息
-        self.messages = await self.db.get_messages(self.thread_id)  # 加 await
+        msg_data = await self.db.get_messages(self.thread_id)
+        if msg_data:
+            messages = []
+            for m in msg_data:
+                msg_dict = {k: v for k, v in m.items() if k != 'conversation_id'}
+                messages.append(Message.from_dict(msg_dict))
+            self.conversation.messages = messages
+            print(f"   📨 加载了 {len(messages)} 条消息")
+        else:
+            self.conversation.messages = []
+            print(f"   📨 没有消息")
         
         # 3. 加载段落
-        self.sections = await self.db.get_sections(self.thread_id)  # 加 await
-        # 4. 最后再次验证对话是否存在（用于调试）
-        exists = await self.db.conversation_exists(self.thread_id)
-        print(f"  对话是否存在: {exists}")
-
-
-    # ==================== 对话基本信息操作 ====================
-    def get_info(self) -> Dict[str, Any]:
-        """获取对话基本信息（从内存）"""
-        return self.conversation.copy()
+        sec_data = await self.db.get_sections(self.thread_id)
+        if sec_data:
+            sections = []
+            for s in sec_data:
+                sec_dict = {k: v for k, v in s.items() if k != 'conversation_id'}
+                sections.append(Section.from_dict(sec_dict))
+            self.conversation.sections = sections
+            print(f"   📄 加载了 {len(sections)} 个段落")
+        else:
+            self.conversation.sections = []
+            print(f"   📄 没有段落")
     
-    async def update_info(self, **kwargs) -> None:
-        """更新对话基本信息
-        
-        Args:
-            **kwargs: 要更新的字段 (phase, title, context)
-        """
-        if not kwargs:
-            return
-        
-        # 1. 更新内存
-        for key, value in kwargs.items():
-            if key in ['phase', 'title', 'context']:
-                self.conversation[key] = value
-        
-        self.conversation['updated_at'] = datetime.utcnow()
-        
-        # 2. 同步到数据库
-        await self._sync_conversation_to_db()
-    
-    async def _sync_conversation_to_db(self):
-        """同步对话基本信息到数据库"""
-        query = """
-        UPDATE conversations 
-        SET title = ?, phase = ?, context = ?, updated_at = ?
-        WHERE id = ?
-        """
-        await self.db.execute(
-            query,
-            [
-                self.conversation.get('title', '新对话'),
-                self.conversation.get('phase', 'planning'),
-                json.dumps(self.conversation.get('context', {}), default=json_serializer),
-                self.conversation['updated_at'],
-                self.thread_id
-            ]
-        )
+    async def _save(self):
+        """保存当前状态到数据库"""
+        print(f"\n💾 [ConversationStore._save] 保存对话 {self.thread_id}")
+        print(f"   使用连接ID: {self.db.connection_id}")  # 添加这行！
+        print(f"   连接对象ID: {id(self.db.connection)}")  # 添加这行！
+        self.conversation.updated_at = datetime.now(timezone.utc)
+        await self.db.save_conversation_info(self.thread_id, self.conversation.to_dict())
+        print(f"   ✅ 对话信息已保存")
     
     # ==================== 消息操作 ====================
     
-    async def add_message(self, message: Dict[str, Any]) -> str:
-        """添加消息（同时更新内存和数据库）
+    async def add_message(
+        self,
+        role: MessageRole,
+        content: str,
+        section_id: Optional[str] = None,
+        metadata: Optional[Dict] = None
+    ) -> Message:
+        """添加消息"""
+        print(f"\n📝 [ConversationStore.add_message] 添加消息到 {self.thread_id}")
         
-        Args:
-            message: 消息字典，包含 role, content, 可选 id, metadata, created_at
-            
-        Returns:
-            消息ID
-        """
-        # 1. 生成消息ID（如果没有提供）
-        msg_id = message.get('id', str(uuid.uuid4()))
-        created_at = message.get('created_at', datetime.utcnow())
+        # 确保 conversation 存在
+        if not self.conversation:
+            await self._load_from_db()
         
-        # 2. 构建完整消息
-        full_message = {
-            'id': msg_id,
-            'role': message['role'],
-            'content': message['content'],
-            'created_at': created_at,
-            'metadata': message.get('metadata', {})
-        }
-        
-        # 3. 更新内存
-        self.messages.append(full_message)
-        
-        # 4. 更新对话的更新时间（内存）
-        self.conversation['updated_at'] = datetime.utcnow()
-        
-        # 5. 同步到数据库（使用事务保证一致性）
-        await self._sync_message_to_db(full_message)
-        await self._sync_conversation_to_db()
-        
-        return msg_id
-    
-    async def _sync_message_to_db(self, message: Dict[str, Any]):
-        """同步单条消息到数据库"""
-        query = """
-        INSERT INTO messages (id, conversation_id, role, content, created_at, metadata)
-        VALUES (?, ?, ?, ?, ?, ?)
-        """
-        await self.db.execute(
-            query,
-            [
-                message['id'],
-                self.thread_id,
-                message['role'],
-                message['content'],
-                message['created_at'],
-                json.dumps(message['metadata'], default=json_serializer)
-            ]
+        message = Message(
+            id=str(uuid.uuid4()),
+            role=role,
+            content=content,
+            created_at=datetime.now(timezone.utc),
+            metadata=metadata or {},
+            section_id=section_id
         )
+        print(f"   消息ID: {message.id}")
+        print(f"   角色: {role.value}")
+        print(f"   内容: {content[:50]}...")
+        
+        # 1. 更新内存
+        self.conversation.messages.append(message)
+        print(f"   内存中现在有 {len(self.conversation.messages)} 条消息")
+        
+        # 2. 保存到数据库
+        msg_dict = {
+            "id": message.id,
+            "role": message.role.value,
+            "content": message.content,
+            "created_at": message.created_at.isoformat(),
+            "metadata": message.metadata,
+            "section_id": message.section_id
+        }
+        await self.db.save_message(self.thread_id, msg_dict)
+        
+        # 3. 更新对话时间并保存
+        await self._save()
+        
+        # 4. 验证保存
+        msgs = await self.db.get_messages(self.thread_id)
+        print(f"   数据库中现在有 {len(msgs)} 条消息")
+        
+        return message
     
-    def get_messages(self, limit: Optional[int] = None) -> List[Dict[str, Any]]:
-        """获取消息列表（从内存）
-        
-        Args:
-            limit: 限制返回数量，默认返回全部
-            
-        Returns:
-            消息列表（按时间正序）
-        """
-        if limit:
-            return self.messages[-limit:]
-        return self.messages.copy()
-    
-    def get_recent_messages(self, count: int = 10) -> List[Dict[str, Any]]:
-        """获取最近N条消息（用于Agent调用）"""
-        return self.messages[-count:]
-    
-    async def delete_message(self, msg_id: str) -> None:
-        """删除消息
-        
-        Args:
-            msg_id: 消息ID
-        """
-        # 1. 从内存删除
-        self.messages = [m for m in self.messages if m['id'] != msg_id]
-        
-        # 2. 从数据库删除
-        query = "DELETE FROM messages WHERE id = ?"
-        await self.db.execute(query, [msg_id])
-        
-        # 3. 更新对话时间
-        self.conversation['updated_at'] = datetime.utcnow()
-        await self._sync_conversation_to_db()
+    def get_recent_messages(self, count: int = 10) -> List[Dict[str, str]]:
+        """获取最近N条消息（用于Agent）"""
+        if not self.conversation or not self.conversation.messages:
+            return []
+        recent = self.conversation.messages[-count:]
+        return [
+            {"role": m.role.value, "content": m.content}
+            for m in recent
+        ]
     
     # ==================== 段落操作 ====================
     
-    async def add_section(self, section: Dict[str, Any]) -> str:
-        """添加段落（同时更新内存和数据库）
-        
-        Args:
-            section: 段落字典，包含 title, content, 可选 status, order, comments, id
+    async def add_section(
+        self,
+        title: str,
+        content: str = "",
+        order: Optional[int] = None,
+        status: SectionStatus = SectionStatus.DRAFT
+    ) -> Section:
+        """添加段落"""
+        if not self.conversation:
+            await self._load_from_db()
             
-        Returns:
-            段落ID
-        """
-        # 1. 生成段落ID
-        section_id = section.get('id', str(uuid.uuid4()))
-        created_at = section.get('created_at', datetime.utcnow())
+        section_id = f"sec-{len(self.conversation.sections) + 1}"
         
-        # 2. 构建完整段落
-        full_section = {
-            'id': section_id,
-            'title': section['title'],
-            'content': section['content'],
-            'status': section.get('status', 'draft'),
-            'order': section.get('order', len(self.sections)),
-            'created_at': created_at,
-            'updated_at': datetime.utcnow(),
-            'comments': section.get('comments', [])
-        }
-        
-        # 3. 更新内存
-        self.sections.append(full_section)
-        # 按order排序
-        self.sections.sort(key=lambda x: x['order'])
-        
-        # 4. 更新对话时间
-        self.conversation['updated_at'] = datetime.utcnow()
-        
-        # 5. 同步到数据库
-        await self._sync_section_to_db(full_section)
-        await self._sync_conversation_to_db()
-        
-        return section_id
-    
-    async def _sync_section_to_db(self, section: Dict[str, Any]):
-        """同步单条段落到数据库"""
-        query = """
-        INSERT INTO sections (
-            id, conversation_id, title, content, status, "order", 
-            created_at, updated_at, comments
+        section = Section(
+            id=section_id,
+            title=title,
+            content=content,
+            status=status,
+            order=order or len(self.conversation.sections),
+            version=1,
+            created_at=datetime.now(timezone.utc),
+            updated_at=datetime.now(timezone.utc),
+            comments=[],
+            metadata={}
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """
-        await self.db.execute(
-            query,
-            [
-                section['id'],
-                self.thread_id,
-                section['title'],
-                section['content'],
-                section['status'],
-                section['order'],
-                section['created_at'],
-                section['updated_at'],
-                json.dumps(section['comments'], default=json_serializer)
-            ]
-        )
-    
-    def get_sections(self) -> List[Dict[str, Any]]:
-        """获取所有段落（从内存，按order排序）"""
-        return self.sections.copy()
-    
-    def get_section(self, section_id: str) -> Optional[Dict[str, Any]]:
-        """获取指定段落"""
-        for section in self.sections:
-            if section['id'] == section_id:
-                return section.copy()
-        return None
-    
-    async def update_section(self, section_id: str, **kwargs) -> bool:
-        """更新段落
         
-        Args:
-            section_id: 段落ID
-            **kwargs: 要更新的字段 (title, content, status, order, comments)
-            
-        Returns:
-            bool: 是否找到并更新
-        """
-        # 1. 在内存中查找并更新
-        found = False
-        for section in self.sections:
-            if section['id'] == section_id:
-                for key, value in kwargs.items():
-                    if key in ['title', 'content', 'status', 'order', 'comments']:
-                        section[key] = value
-                section['updated_at'] = datetime.utcnow()
-                found = True
-                break
-        
-        if not found:
-            return False
-        
-        # 2. 重新排序
-        self.sections.sort(key=lambda x: x['order'])
-        
-        # 3. 更新对话时间
-        self.conversation['updated_at'] = datetime.utcnow()
-        
-        # 4. 同步到数据库
-        await self._sync_section_update_to_db(section_id, kwargs)
-        await self._sync_conversation_to_db()
-        
-        return True
-    
-    async def _sync_section_update_to_db(self, section_id: str, updates: Dict[str, Any]):
-        """同步段落更新到数据库"""
-        if not updates:
-            return
-        
-        sets = []
-        values = []
-        for key, value in updates.items():
-            if key in ['title', 'content', 'status', 'order', 'comments']:
-                sets.append(f"{key} = ?")
-                if key == 'comments':
-                    values.append(json.dumps(value, default=json_serializer))
-                else:
-                    values.append(value)
-        
-        if not sets:
-            return
-        
-        sets.append("updated_at = ?")
-        values.append(datetime.utcnow())
-        values.append(section_id)
-        
-        query = f"UPDATE sections SET {', '.join(sets)} WHERE id = ?"
-        await self.db.execute(query, values)
-    
-    async def update_section_status(self, section_id: str, status: str) -> bool:
-        """更新段落状态（常用操作）"""
-        return await self.update_section(section_id, status=status)
-    
-    async def delete_section(self, section_id: str) -> None:
-        """删除段落"""
-        # 1. 从内存删除
-        self.sections = [s for s in self.sections if s['id'] != section_id]
-        
-        # 2. 重新排序（如果需要）
-        for i, section in enumerate(self.sections):
-            section['order'] = i
-        
-        # 3. 从数据库删除
-        query = "DELETE FROM sections WHERE id = ?"
-        await self.db.execute(query, [section_id])
-        
-        # 4. 更新对话时间
-        self.conversation['updated_at'] = datetime.utcnow()
-        await self._sync_conversation_to_db()
-    
-    # ==================== 完整对话操作 ====================
-    def to_dict(self) -> Dict[str, Any]:
-        """将当前对话转换为字典（用于API返回）"""
-        return {
-            "id": self.thread_id,
-            "title": self.conversation.get('title', '新对话'),
-            "phase": self.conversation.get('phase', 'planning'),
-            "context": self.conversation.get('context', {}),
-            "created_at": self.conversation.get('created_at'),
-            "updated_at": self.conversation.get('updated_at'),
-            "messages": self.messages,
-            "sections": self.sections,
-            "message_count": len(self.messages),
-            "section_count": len(self.sections)
-        }
-    
-    async def delete_conversation(self) -> None:
-        """删除整个对话（级联删除）"""
-        # 1. 清空内存
-        self.messages = []
-        self.sections = []
-        self.conversation = {}
-        
-        # 2. 从数据库删除（外键级联）
-        query = "DELETE FROM conversations WHERE id = ?"
-        await self.db.execute(query, [self.thread_id])
-    
-    # ==================== 工具方法 ====================
-    
-    def is_new(self) -> bool:
-        """是否是新对话（没有消息）"""
-        return len(self.messages) == 0
-    
-    def get_phase(self) -> str:
-        """获取当前阶段"""
-        return self.conversation.get('phase', 'planning')
-    
-    async def set_phase(self, phase: str) -> None:
-        """设置当前阶段"""
-        await self.update_info(phase=phase)
-
-     # ========== 阶段4：报告写作流程 ==========
-    
-    async def generate_report(self, topic: str):
-        """生成完整报告（规划→写作→审核）"""
-        # 1. 规划大纲
-        plan = await self._plan_outline(topic)
-        
-        # 2. 保存大纲到sections（作为草稿）
-        for i, title in enumerate(plan):
-            section = {
-                "id": f"sec-{i+1}",
-                "title": title,
-                "content": "",
-                "status": "draft",
-                "order": i+1
-            }
-            await self.add_section(section)
-        
-        # 3. 更新阶段为大纲待确认
-        self.state.phase = "reviewing_plan"
+        self.conversation.sections.append(section)
         await self._save()
         
-        # 4. 设置待确认问题
-        self.state.pending_question = "大纲已生成，您满意吗？"
-        self.state.pending_options = ["确认", "修改大纲"]
+        # 同步到数据库
+        await self.db.save_section(self.thread_id, {
+            "id": section.id,
+            "title": section.title,
+            "content": section.content,
+            "status": section.status.value,
+            "order": section.order,
+            "version": section.version,
+            "created_at": section.created_at.isoformat(),
+            "updated_at": section.updated_at.isoformat(),
+            "comments": section.comments,
+            "metadata": section.metadata
+        })
         
-        return plan
+        return section
+    
+    def get_section(self, section_id: str) -> Optional[Section]:
+        """获取指定段落"""
+        if not self.conversation:
+            return None
+        for s in self.conversation.sections:
+            if s.id == section_id:
+                return s
+        return None
+    
+    # ==================== 业务逻辑 ====================
+    
+    async def generate_report(self, topic: str):
+        """生成报告（规划大纲）"""
+        if not self.conversation:
+            await self._load_from_db()
+            
+        self.conversation.title = topic
+        self.conversation.phase = Phase.PLANNING
+        
+        # 创建大纲段落（示例）
+        sections = [
+            await self.add_section("引言", order=1),
+            await self.add_section("主体", order=2),
+            await self.add_section("结论", order=3)
+        ]
+        
+        # 设置等待用户确认
+        self.conversation.pending_question = "大纲已生成，您满意吗？"
+        self.conversation.pending_options = ["确认", "修改大纲"]
+        
+        await self._save()
+        return sections
     
     async def approve_plan(self):
         """确认大纲，开始写作"""
-        self.state.phase = "writing"
-        self.state.pending_question = None
-        self.state.pending_options = []
+        if not self.conversation:
+            await self._load_from_db()
+            
+        self.conversation.phase = Phase.WRITING
+        self.conversation.pending_question = None
+        self.conversation.pending_options = []
         await self._save()
         
         # 开始写第一段
@@ -489,115 +250,105 @@ class ConversationStore:
     
     async def _write_next_section(self):
         """写下一个未完成的段落"""
-        # 找到第一个draft状态的段落
-        for section in self.sections:
-            if section.status == "draft" and not section.content:
+        if not self.conversation:
+            return
+            
+        for section in self.conversation.sections:
+            if section.status == SectionStatus.DRAFT and not section.content:
+                self.conversation.current_section_id = section.id
                 await self._write_section(section)
                 return
         
         # 所有段落都完成了
-        self.state.phase = "completed"
+        self.conversation.phase = Phase.COMPLETED
+        self.conversation.current_section_id = None
         await self._save()
     
-    async def _write_section(self, section):
-        """写单个段落（流式）"""
-        self.state.current_section_id = section.id
+    async def _write_section(self, section: Section):
+        """写单个段落"""
+        section.content = f"这是{section.title}的内容。这里是详细的论述和分析。"
+        section.updated_at = datetime.now(timezone.utc)
         
-        # 构建提示词
-        prompt = f"请写报告的第{section.order}部分：{section.title}\n"
-        prompt += f"报告主题：{self.state.title}\n"
-        if self._get_confirmed_sections():
-            prompt += f"已完成的段落：{self._get_confirmed_sections()}"
-        
-        # 调用Agent流式生成
-        agent = get_agent()
-        messages = [{"role": "user", "content": prompt}]
-        
-        full_content = ""
-        async for chunk in agent.run(messages, stream=True):
-            if chunk.get("type") == "chunk":
-                full_content += chunk.get("content", "")
-                # 通过WebSocket推送流式内容（由控制器处理）
-                yield chunk
-        
-        # 更新段落内容
-        section.content = full_content
-        section.status = "draft"
-        self.state.phase = "reviewing_section"
-        self.state.pending_question = f"{section.title}完成，您满意吗？"
-        self.state.pending_options = ["确认", "修改", "重写"]
+        self.conversation.phase = Phase.REVIEWING_SECTION
+        self.conversation.pending_question = f"{section.title}完成，您满意吗？"
+        self.conversation.pending_options = ["确认", "修改", "重写"]
         
         await self._save()
     
     async def approve_section(self, section_id: str):
         """确认段落"""
-        section = self._get_section(section_id)
-        section.status = "confirmed"
-        self.state.pending_question = None
-        self.state.pending_options = []
-        await self._save()
-        
-        # 继续写下一段
-        await self._write_next_section()
+        section = self.get_section(section_id)
+        if section:
+            section.status = SectionStatus.CONFIRMED
+            section.updated_at = datetime.now(timezone.utc)
+            
+            self.conversation.pending_question = None
+            self.conversation.pending_options = []
+            
+            await self._save()
+            
+            # 继续写下一段
+            await self._write_next_section()
     
-    async def edit_section(self, section_id: str, instruction: str):
+    async def edit_section(self, section_id: str, instruction: str) -> str:
         """修改段落"""
-        section = self._get_section(section_id)
-        section.status = "editing"
-        self.state.edit_target_id = section_id
+        section = self.get_section(section_id)
+        if not section:
+            return ""
+        
+        section.status = SectionStatus.EDITING
+        self.conversation.edit_target_id = section_id
+        self.conversation.edit_instruction = instruction
         await self._save()
         
-        # 调用Agent修改
-        prompt = f"请修改以下段落：\n{section.content}\n修改意见：{instruction}"
-        messages = [{"role": "user", "content": prompt}]
-        
-        agent = get_agent()
-        response = await agent.run(messages, stream=False)
-        
-        # 更新段落
-        section.content = response.get("content", "")
-        section.status = "draft"
+        # 模拟修改内容
+        new_content = f"{section.content}\n\n[根据意见修改: {instruction}]"
+        section.content = new_content
         section.version += 1
-        self.state.edit_target_id = None
+        section.status = SectionStatus.PENDING
+        section.updated_at = datetime.now(timezone.utc)
         
-        # 继续询问确认
-        self.state.pending_question = f"{section.title}修改完成，您满意吗？"
-        self.state.pending_options = ["确认", "再次修改"]
+        self.conversation.edit_target_id = None
+        self.conversation.edit_instruction = None
+        self.conversation.pending_question = f"{section.title}修改完成，您满意吗？"
+        self.conversation.pending_options = ["确认", "再次修改"]
         
         await self._save()
         
-        return section.content
+        return new_content
     
     async def regenerate_section(self, section_id: str):
         """重写段落"""
-        section = self._get_section(section_id)
-        section.content = ""
-        section.status = "draft"
-        await self._save()
-        
-        # 重新生成
-        await self._write_section(section)
+        section = self.get_section(section_id)
+        if section:
+            section.content = ""
+            section.status = SectionStatus.DRAFT
+            section.version += 1
+            section.updated_at = datetime.now(timezone.utc)
+            
+            self.conversation.current_section_id = section_id
+            await self._save()
+            
+            await self._write_section(section)
     
-    # ========== 辅助方法 ==========
+    # ==================== 工具方法 ====================
     
-    def _get_section(self, section_id: str):
-        """获取段落"""
-        for section in self.sections:
-            if section.id == section_id:
-                return section
-        return None
+    def get_phase(self) -> str:
+        """获取当前阶段"""
+        if not self.conversation:
+            return "unknown"
+        return self.conversation.phase.value
     
-    def _get_confirmed_sections(self):
-        """获取已确认的段落内容"""
-        confirmed = []
-        for section in self.sections:
-            if section.status == "confirmed":
-                confirmed.append(f"## {section.title}\n{section.content}")
-        return "\n\n".join(confirmed)
+    @property
+    def messages(self) -> List[Message]:
+        """获取消息列表"""
+        if not self.conversation:
+            return []
+        return self.conversation.messages
     
-    def _has_next_section(self):
-        """是否还有未写的段落"""
-        for section in self.sections:
-            if section.status == "draft" and not section.content:
-                return True
-        return False
+    @property
+    def sections(self) -> List[Section]:
+        """获取段落列表"""
+        if not self.conversation:
+            return []
+        return self.conversation.sections

@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI报告写作系统 - WebSocket测试</title>
+    <title>AI报告写作系统 - WebSocket测试（新版）</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -12,50 +13,69 @@
             padding: 20px;
             background-color: #f5f5f5;
         }
+
         h1 {
             color: #333;
             border-bottom: 2px solid #4CAF50;
             padding-bottom: 10px;
         }
+
+        .subtitle {
+            color: #666;
+            margin-top: -5px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
         .container {
             display: flex;
             gap: 20px;
             margin-top: 20px;
         }
+
         .left-panel {
             flex: 1;
             background: white;
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+
         .right-panel {
             flex: 2;
             background: white;
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+
         .form-group {
             margin-bottom: 15px;
         }
+
         label {
             display: block;
             margin-bottom: 5px;
             font-weight: bold;
             color: #555;
         }
-        input, textarea, select {
+
+        input,
+        textarea,
+        select {
             width: 100%;
             padding: 8px;
             border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 14px;
+            box-sizing: border-box;
         }
+
         textarea {
-            height: 100px;
+            height: 80px;
             resize: vertical;
         }
+
         button {
             background-color: #4CAF50;
             color: white;
@@ -65,93 +85,149 @@
             cursor: pointer;
             font-size: 14px;
             margin-right: 10px;
+            margin-bottom: 10px;
         }
+
         button:hover {
             background-color: #45a049;
         }
+
         button.danger {
             background-color: #f44336;
         }
+
         button.danger:hover {
             background-color: #da190b;
         }
+
         button.secondary {
             background-color: #2196F3;
         }
+
         button.secondary:hover {
             background-color: #0b7dda;
         }
+
+        button.small {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
         .status {
             padding: 10px;
             border-radius: 4px;
             margin-bottom: 15px;
             font-weight: bold;
         }
+
         .connected {
             background-color: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
         }
+
         .disconnected {
             background-color: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
+
         .messages {
-            height: 400px;
+            height: 450px;
             overflow-y: auto;
             border: 1px solid #ddd;
             padding: 10px;
             border-radius: 4px;
             background-color: #fafafa;
+            font-family: 'Consolas', monospace;
+            font-size: 13px;
         }
+
         .message {
-            margin-bottom: 10px;
-            padding: 8px;
-            border-radius: 4px;
-            font-size: 14px;
+            margin-bottom: 12px;
+            padding: 10px;
+            border-radius: 6px;
+            border-left: 4px solid transparent;
         }
+
         .user-message {
             background-color: #e3f2fd;
-            text-align: right;
+            border-left-color: #2196F3;
         }
+
         .assistant-message {
             background-color: #f1f8e9;
+            border-left-color: #4CAF50;
         }
+
         .system-message {
             background-color: #fff3e0;
-            font-style: italic;
+            border-left-color: #FF9800;
         }
-        .chunk-message {
-            background-color: #e8eaf6;
-            border-left: 3px solid #3f51b5;
-        }
+
         .error-message {
             background-color: #ffebee;
-            color: #c62828;
-            border-left: 3px solid #c62828;
+            border-left-color: #f44336;
         }
+
         .message-header {
             font-weight: bold;
             margin-bottom: 5px;
             font-size: 12px;
             color: #666;
+            display: flex;
+            justify-content: space-between;
         }
+
         .message-content {
             word-wrap: break-word;
+            white-space: pre-wrap;
         }
+
         .event-type {
             display: inline-block;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
             font-weight: bold;
-            margin-right: 5px;
+            background-color: #e0e0e0;
         }
-        .event-type-sync { background-color: #e1f5fe; color: #01579b; }
-        .event-type-chunk { background-color: #e8f5e8; color: #1b5e20; }
-        .event-type-complete { background-color: #fff9c4; color: #f57f17; }
-        .event-type-error { background-color: #ffcdd2; color: #b71c1c; }
+
+        .event-type-sync {
+            background-color: #e1f5fe;
+            color: #01579b;
+        }
+
+        .event-type-chunk {
+            background-color: #e8f5e8;
+            color: #1b5e20;
+        }
+
+        .event-type-prompt {
+            background-color: #fff9c4;
+            color: #f57f17;
+        }
+
+        .event-type-section_ready {
+            background-color: #d1c4e9;
+            color: #311b92;
+        }
+
+        .event-type-section_updated {
+            background-color: #b2ebf2;
+            color: #006064;
+        }
+
+        .event-type-report_completed {
+            background-color: #c8e6c9;
+            color: #1b5e20;
+        }
+
+        .event-type-error {
+            background-color: #ffcdd2;
+            color: #b71c1c;
+        }
+
         .stats {
             display: flex;
             gap: 20px;
@@ -159,96 +235,152 @@
             padding: 10px;
             background-color: #e9ecef;
             border-radius: 4px;
+            flex-wrap: wrap;
         }
+
         .stat-item {
-            font-size: 14px;
+            font-size: 13px;
         }
+
         .stat-label {
             font-weight: bold;
             color: #495057;
         }
+
         .action-buttons {
             margin-top: 20px;
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
         }
+
+        .quick-test {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed #ddd;
+        }
+
+        .request-id {
+            color: #999;
+            font-size: 10px;
+        }
+
+        .timestamp {
+            color: #999;
+            font-size: 10px;
+        }
     </style>
 </head>
+
 <body>
-    <h1>🤖 AI报告写作系统 - WebSocket测试</h1>
-    
+    <h1>🤖 AI报告写作系统 - WebSocket测试（新版）</h1>
+    <div class="subtitle">使用纯数据模型 | 事件类型: start/message/approve/edit_section/regenerate</div>
+
     <div class="container">
         <div class="left-panel">
-            <h2>连接设置</h2>
+            <h2>🔌 连接设置</h2>
             <div class="form-group">
                 <label for="threadId">对话ID (thread_id):</label>
                 <input type="text" id="threadId" value="test-123" placeholder="输入对话ID">
+                <div style="margin-top: 5px; font-size: 12px; color: #666;">每个ID对应一个独立的对话实例</div>
             </div>
-            
+
             <div class="form-group">
                 <label>连接状态:</label>
                 <div id="connectionStatus" class="status disconnected">未连接</div>
             </div>
-            
+
             <button id="connectBtn" class="secondary">🔌 连接</button>
             <button id="disconnectBtn" class="danger" disabled>❌ 断开</button>
-            
+
             <div class="stats" id="connectionStats">
-                <div class="stat-item"><span class="stat-label">连接数:</span> <span id="activeConnections">-</span></div>
+                <div class="stat-item"><span class="stat-label">活跃对话:</span> <span id="activeConnections">-</span></div>
                 <div class="stat-item"><span class="stat-label">Agent状态:</span> <span id="agentStatus">-</span></div>
             </div>
-            
-            <h2 style="margin-top: 30px;">发送消息</h2>
+
+            <h2 style="margin-top: 30px;">📤 发送消息</h2>
             <div class="form-group">
                 <label for="messageType">消息类型:</label>
                 <select id="messageType">
-                    <option value="ping">PING (心跳)</option>
-                    <option value="start">START (开始对话)</option>
-                    <option value="message" selected>MESSAGE (发送消息)</option>
-                    <option value="cancel">CANCEL (取消)</option>
+                    <option value="ping">PING (心跳测试)</option>
+                    <option value="start" selected>START (开始新对话)</option>
+                    <option value="message">MESSAGE (发送消息)</option>
+                    <option value="approve">APPROVE (确认大纲/段落)</option>
+                    <option value="edit_section">EDIT_SECTION (修改段落)</option>
+                    <option value="regenerate">REGENERATE (重写段落)</option>
+                    <option value="cancel">CANCEL (取消操作)</option>
                 </select>
             </div>
-            
+
+            <!-- START 字段 -->
             <div id="startFields" style="display: none;">
                 <div class="form-group">
                     <label for="startTitle">对话标题:</label>
-                    <input type="text" id="startTitle" value="新报告" placeholder="输入对话标题">
+                    <input type="text" id="startTitle" value="AI医疗报告" placeholder="输入报告标题">
                 </div>
             </div>
-            
-            <div id="messageFields">
+
+            <!-- MESSAGE 字段 -->
+            <div id="messageFields" style="display: block;">
                 <div class="form-group">
                     <label for="messageContent">消息内容:</label>
-                    <textarea id="messageContent" placeholder="输入消息内容...">帮我写一份关于人工智能发展报告</textarea>
+                    <textarea id="messageContent" placeholder="输入消息内容...">帮我写一份关于人工智能在医疗领域应用的报告</textarea>
                 </div>
                 <div class="form-group">
                     <label for="replyTo">回复目标 (可选):</label>
                     <input type="text" id="replyTo" placeholder="消息ID">
                 </div>
             </div>
-            
+
+            <!-- APPROVE/EDIT/REGENERATE 字段（动态显示） -->
+            <div id="sectionFields" style="display: none;">
+                <div class="form-group">
+                    <label for="sectionId">段落ID:</label>
+                    <input type="text" id="sectionId" placeholder="如: sec-1">
+                </div>
+                <div class="form-group" id="instructionField" style="display: none;">
+                    <label for="instruction">修改意见:</label>
+                    <textarea id="instruction" placeholder="输入修改意见..."></textarea>
+                </div>
+                <div class="form-group" id="feedbackField" style="display: none;">
+                    <label for="feedback">反馈意见 (可选):</label>
+                    <input type="text" id="feedback" placeholder="反馈意见">
+                </div>
+            </div>
+
             <div class="action-buttons">
                 <button id="sendBtn" disabled>📤 发送</button>
                 <button id="clearMessagesBtn" class="secondary">🗑️ 清空消息</button>
             </div>
-            
-            <div class="form-group">
-                <label>快速测试:</label>
-                <button id="testPingBtn" disabled>🏓 发送Ping</button>
-                <button id="testStartBtn" disabled>🚀 发送Start</button>
+
+            <div class="quick-test">
+                <h3>⚡ 快速测试流程</h3>
+                <button id="testPingBtn" class="small" disabled>1. 测试Ping</button>
+                <button id="testStartBtn" class="small" disabled>2. 开始新对话</button>
+                <button id="testApprovePlanBtn" class="small" disabled>3. 确认大纲</button>
+                <button id="testMessageBtn" class="small" disabled>4. 发送消息</button>
+                <button id="testApproveSectionBtn" class="small" disabled>5. 确认段落</button>
+                <div style="margin-top: 10px; font-size: 12px; color: #666;">
+                    提示：按顺序点击测试完整流程
+                </div>
             </div>
         </div>
-        
+
         <div class="right-panel">
-            <h2>消息日志</h2>
+            <h2>📋 消息日志</h2>
             <div id="messages" class="messages">
                 <!-- 消息会动态添加到这里 -->
             </div>
-            
+
             <div class="stats">
                 <div class="stat-item"><span class="stat-label">总消息:</span> <span id="totalMessages">0</span></div>
                 <div class="stat-item"><span class="stat-label">最后活动:</span> <span id="lastActivity">-</span></div>
+                <div class="stat-item"><span class="stat-label">当前阶段:</span> <span id="currentPhase">-</span></div>
+            </div>
+
+            <div style="margin-top: 10px; font-size: 12px; color: #666; text-align: right;">
+                支持的事件类型: sync, chunk, complete, prompt, section_ready, section_updated, state_change, report_completed,
+                task_progress, interrupt, error, pong
             </div>
         </div>
     </div>
@@ -257,7 +389,7 @@
         let ws = null;
         let messageCount = 0;
         let currentThreadId = '';
-        
+
         // DOM 元素
         const threadIdInput = document.getElementById('threadId');
         const connectBtn = document.getElementById('connectBtn');
@@ -268,40 +400,79 @@
         const messagesDiv = document.getElementById('messages');
         const totalMessagesSpan = document.getElementById('totalMessages');
         const lastActivitySpan = document.getElementById('lastActivity');
+        const currentPhaseSpan = document.getElementById('currentPhase');
         const messageType = document.getElementById('messageType');
         const startFields = document.getElementById('startFields');
         const messageFields = document.getElementById('messageFields');
+        const sectionFields = document.getElementById('sectionFields');
+        const instructionField = document.getElementById('instructionField');
+        const feedbackField = document.getElementById('feedbackField');
+
+        // 输入字段
         const startTitle = document.getElementById('startTitle');
         const messageContent = document.getElementById('messageContent');
         const replyTo = document.getElementById('replyTo');
+        const sectionId = document.getElementById('sectionId');
+        const instruction = document.getElementById('instruction');
+        const feedback = document.getElementById('feedback');
+
+        // 测试按钮
         const testPingBtn = document.getElementById('testPingBtn');
         const testStartBtn = document.getElementById('testStartBtn');
+        const testApprovePlanBtn = document.getElementById('testApprovePlanBtn');
+        const testMessageBtn = document.getElementById('testMessageBtn');
+        const testApproveSectionBtn = document.getElementById('testApproveSectionBtn');
+
+        // 状态显示
         const activeConnectionsSpan = document.getElementById('activeConnections');
         const agentStatusSpan = document.getElementById('agentStatus');
-        
+
         // 消息类型切换
-        messageType.addEventListener('change', function() {
+        messageType.addEventListener('change', function () {
             const type = this.value;
-            startFields.style.display = type === 'start' ? 'block' : 'none';
-            messageFields.style.display = type === 'message' ? 'block' : 'none';
+
+            // 隐藏所有动态字段
+            startFields.style.display = 'none';
+            messageFields.style.display = 'none';
+            sectionFields.style.display = 'none';
+            instructionField.style.display = 'none';
+            feedbackField.style.display = 'none';
+
+            // 根据类型显示对应字段
+            if (type === 'start') {
+                startFields.style.display = 'block';
+            } else if (type === 'message') {
+                messageFields.style.display = 'block';
+            } else if (type === 'approve') {
+                sectionFields.style.display = 'block';
+                feedbackField.style.display = 'block';
+            } else if (type === 'edit_section') {
+                sectionFields.style.display = 'block';
+                instructionField.style.display = 'block';
+            } else if (type === 'regenerate') {
+                sectionFields.style.display = 'block';
+            }
         });
-        
+
         // 连接
         connectBtn.addEventListener('click', connect);
-        
+
         // 断开
         disconnectBtn.addEventListener('click', disconnect);
-        
+
         // 发送消息
         sendBtn.addEventListener('click', sendMessage);
-        
+
         // 清空消息
         clearMessagesBtn.addEventListener('click', clearMessages);
-        
-        // 测试按钮
+
+        // 快速测试按钮
         testPingBtn.addEventListener('click', () => sendPing());
         testStartBtn.addEventListener('click', () => sendStart());
-        
+        testApprovePlanBtn.addEventListener('click', () => sendApprovePlan());
+        testMessageBtn.addEventListener('click', () => sendQuickMessage());
+        testApproveSectionBtn.addEventListener('click', () => sendApproveSection('sec-1'));
+
         // 连接函数
         function connect() {
             const threadId = threadIdInput.value.trim();
@@ -309,20 +480,27 @@
                 alert('请输入对话ID');
                 return;
             }
-            
+
             currentThreadId = threadId;
             const wsUrl = `ws://${window.location.host}/ws/${threadId}`;
-            
+
             try {
                 ws = new WebSocket(wsUrl);
-                
-                ws.onopen = function() {
+
+                ws.onopen = function () {
                     updateConnectionStatus(true);
                     addSystemMessage('🔌 连接已建立', `对话ID: ${threadId}`);
                     fetchStatus();
+
+                    // 自动发送一个start开始对话
+                    setTimeout(() => {
+                        if (ws && ws.readyState === WebSocket.OPEN) {
+                            addSystemMessage('💡 提示', '你可以点击"开始新对话"或发送消息');
+                        }
+                    }, 500);
                 };
-                
-                ws.onmessage = function(event) {
+
+                ws.onmessage = function (event) {
                     try {
                         const data = JSON.parse(event.data);
                         handleIncomingMessage(data);
@@ -330,21 +508,21 @@
                         addErrorMessage('解析消息失败', event.data);
                     }
                 };
-                
-                ws.onclose = function(event) {
+
+                ws.onclose = function (event) {
                     updateConnectionStatus(false);
                     addSystemMessage('🔌 连接已关闭', `代码: ${event.code}, 原因: ${event.reason || '正常关闭'}`);
                 };
-                
-                ws.onerror = function(error) {
-                    addErrorMessage('WebSocket错误', error);
+
+                ws.onerror = function (error) {
+                    addErrorMessage('WebSocket错误', '连接失败，请确保服务已启动');
                 };
-                
+
             } catch (e) {
                 addErrorMessage('连接失败', e.message);
             }
         }
-        
+
         // 断开连接
         function disconnect() {
             if (ws) {
@@ -352,7 +530,7 @@
                 ws = null;
             }
         }
-        
+
         // 更新连接状态
         function updateConnectionStatus(connected) {
             if (connected) {
@@ -363,6 +541,9 @@
                 sendBtn.disabled = false;
                 testPingBtn.disabled = false;
                 testStartBtn.disabled = false;
+                testApprovePlanBtn.disabled = false;
+                testMessageBtn.disabled = false;
+                testApproveSectionBtn.disabled = false;
             } else {
                 connectionStatus.className = 'status disconnected';
                 connectionStatus.textContent = '未连接';
@@ -371,31 +552,34 @@
                 sendBtn.disabled = true;
                 testPingBtn.disabled = true;
                 testStartBtn.disabled = true;
+                testApprovePlanBtn.disabled = true;
+                testMessageBtn.disabled = true;
+                testApproveSectionBtn.disabled = true;
             }
         }
-        
+
         // 发送消息
         function sendMessage() {
             if (!ws || ws.readyState !== WebSocket.OPEN) {
                 alert('WebSocket未连接');
                 return;
             }
-            
+
             const type = messageType.value;
             let message = { type: type };
-            
-            switch(type) {
+
+            switch (type) {
                 case 'ping':
                     message.data = { timestamp: new Date().toISOString() };
                     break;
-                    
+
                 case 'start':
                     message.data = {
                         title: startTitle.value || '新对话',
                         context: {}
                     };
                     break;
-                    
+
                 case 'message':
                     const content = messageContent.value.trim();
                     if (!content) {
@@ -407,150 +591,302 @@
                         reply_to: replyTo.value || null
                     };
                     break;
-                    
+
+                case 'approve':
+                    message.data = {
+                        section_id: sectionId.value || undefined,
+                        feedback: feedback.value || undefined
+                    };
+                    break;
+
+                case 'edit_section':
+                    if (!sectionId.value) {
+                        alert('请输入段落ID');
+                        return;
+                    }
+                    message.data = {
+                        section_id: sectionId.value,
+                        instruction: instruction.value || '请修改这段内容'
+                    };
+                    break;
+
+                case 'regenerate':
+                    if (!sectionId.value) {
+                        alert('请输入段落ID');
+                        return;
+                    }
+                    message.data = {
+                        section_id: sectionId.value
+                    };
+                    break;
+
                 case 'cancel':
                     message.data = {};
                     break;
             }
-            
-            // 添加请求ID用于跟踪
-            message.request_id = generateRequestId();
-            
+
+            // 添加请求ID
+            message.request_id = 'req_' + Math.random().toString(36).substr(2, 9);
+
             ws.send(JSON.stringify(message));
             addSentMessage(type, message.data, message.request_id);
-            
-            // 更新最后活动时间
             updateLastActivity();
         }
-        
-        // 发送Ping
+
+        // 快速测试函数
         function sendPing() {
             messageType.value = 'ping';
+            messageType.dispatchEvent(new Event('change'));
             sendMessage();
         }
-        
-        // 发送Start
+
         function sendStart() {
             messageType.value = 'start';
+            messageType.dispatchEvent(new Event('change'));
             sendMessage();
         }
-        
+
+        function sendApprovePlan() {
+            messageType.value = 'approve';
+            messageType.dispatchEvent(new Event('change'));
+            sectionId.value = '';
+            feedback.value = '';
+            sendMessage();
+        }
+
+        function sendQuickMessage() {
+            messageType.value = 'message';
+            messageType.dispatchEvent(new Event('change'));
+            messageContent.value = '帮我写一份关于AI医疗的报告';
+            sendMessage();
+        }
+
+        function sendApproveSection(sectionIdValue) {
+            messageType.value = 'approve';
+            messageType.dispatchEvent(new Event('change'));
+            sectionId.value = sectionIdValue;
+            feedback.value = '';
+            sendMessage();
+        }
+
         // 处理接收到的消息
         function handleIncomingMessage(data) {
             const type = data.type;
             const eventData = data.data || {};
             const timestamp = data.timestamp || new Date().toISOString();
             const requestId = data.request_id;
-            
+
             let title = '';
             let content = '';
-            
-            switch(type) {
+            let messageType_class = 'system';
+            let eventClass = 'sync';
+
+            // 尝试更新当前阶段
+            if (eventData.phase) {
+                currentPhaseSpan.textContent = eventData.phase;
+            }
+
+            switch (type) {
                 case 'sync':
                     title = `🔄 同步 [${eventData.type || 'unknown'}]`;
-                    content = JSON.stringify(eventData, null, 2);
+
+                    if (eventData.type === 'history' && eventData.messages) {
+                        // 显示所有历史消息
+                        content = `共 ${eventData.total || eventData.messages.length} 条历史消息:\n`;
+                        eventData.messages.forEach(msg => {
+                            const time = new Date(msg.created_at).toLocaleTimeString();
+                            content += `\n[${time}] ${msg.role}: ${msg.content.substring(0, 50)}${msg.content.length > 50 ? '...' : ''}`;
+                        });
+                    } else {
+                        content = JSON.stringify(eventData, null, 2);
+                    }
+
                     addMessage('system', title, content, timestamp, 'sync');
                     break;
-                    
+
                 case 'chunk':
-                    title = `📝 流式块 [${eventData.message_id || 'unknown'}]`;
-                    content = eventData.text || '';
-                    addMessage('chunk', title, content, timestamp, 'chunk');
+                    title = `📝 流式块`;
+                    content = `[${eventData.section_id || '未知段落'}]: ${eventData.text}`;
+                    messageType_class = 'assistant';
+                    eventClass = 'chunk';
                     break;
-                    
+
                 case 'complete':
                     title = `✅ 完成 [${eventData.message_id}]`;
-                    content = `完整内容: ${eventData.full_content}\n元数据: ${JSON.stringify(eventData.metadata || {})}`;
-                    addMessage('assistant', title, content, timestamp, 'complete');
+                    content = `完整内容: ${eventData.full_content ? eventData.full_content.substring(0, 150) + '...' : ''}`;
+                    if (eventData.metadata) {
+                        content += `\n元数据: ${JSON.stringify(eventData.metadata)}`;
+                    }
+                    messageType_class = 'assistant';
+                    eventClass = 'complete';
                     break;
-                    
+
+                case 'prompt':
+                    title = `❓ 需要确认`;
+                    content = `问题: ${eventData.question || ''}\n选项: ${(eventData.options || []).join(', ')}`;
+                    if (eventData.context) {
+                        content += `\n上下文: ${JSON.stringify(eventData.context)}`;
+                    }
+                    eventClass = 'prompt';
+                    break;
+
+                case 'section_ready':
+                    title = `📄 段落就绪 [${eventData.section_id}]`;
+                    content = `标题: ${eventData.title || ''}\n`;
+                    content += `内容: ${eventData.content ? eventData.content.substring(0, 150) + '...' : ''}\n`;
+                    content += `问题: ${eventData.question || ''}\n选项: ${(eventData.options || []).join(', ')}`;
+                    eventClass = 'section_ready';
+                    break;
+
+                case 'section_updated':
+                    title = `✏️ 段落已更新 [${eventData.section_id}]`;
+                    content = `版本: ${eventData.version || 1}\n`;
+                    content += `状态: ${eventData.status || ''}\n`;
+                    content += `新内容: ${eventData.content ? eventData.content.substring(0, 150) + '...' : ''}`;
+                    eventClass = 'section_updated';
+                    break;
+
+                case 'state_change':
+                    title = `🔄 状态变更`;
+                    content = `新阶段: ${eventData.phase || 'unknown'}`;
+                    if (eventData.current_section) {
+                        content += `\n当前段落: ${eventData.current_section}`;
+                    }
+                    eventClass = 'state_change';
+                    break;
+
+                case 'report_completed':
+                    title = `🎉 报告完成`;
+                    content = `总段落: ${eventData.total_sections || 0}\n`;
+                    content += `总字数: ${eventData.total_words || 0}\n`;
+                    content += `可导出格式: ${(eventData.export_formats || []).join(', ')}`;
+                    eventClass = 'report_completed';
+                    break;
+
+                case 'task_progress':
+                    title = `⏳ 任务进度 [${eventData.task_id}]`;
+                    content = `${Math.round((eventData.progress || 0) * 100)}% - ${eventData.message || ''}`;
+                    if (eventData.status) {
+                        content += `\n状态: ${eventData.status}`;
+                    }
+                    eventClass = 'task_progress';
+                    break;
+
+                case 'interrupt':
+                    title = `⚠️ 需要介入`;
+                    content = `原因: ${eventData.reason || ''}`;
+                    if (eventData.question) content += `\n问题: ${eventData.question}`;
+                    if (eventData.options) content += `\n选项: ${eventData.options.join(', ')}`;
+                    if (eventData.section_id) content += `\n段落: ${eventData.section_id}`;
+                    eventClass = 'interrupt';
+                    break;
+
                 case 'error':
                     title = `❌ 错误 [${eventData.code}]`;
-                    content = `${eventData.message}\n${JSON.stringify(eventData.details || {})}`;
-                    addMessage('error', title, content, timestamp, 'error');
+                    content = eventData.message || '';
+                    if (eventData.details) {
+                        content += `\n详情: ${JSON.stringify(eventData.details)}`;
+                    }
+                    messageType_class = 'error';
+                    eventClass = 'error';
                     break;
-                    
+
                 case 'pong':
                     title = `🏓 PONG`;
-                    content = JSON.stringify(eventData, null, 2);
-                    addMessage('system', title, content, timestamp, 'pong');
+                    content = `服务器时间: ${eventData.timestamp || ''}`;
+                    if (eventData.echo) {
+                        content += `\n回显: ${JSON.stringify(eventData.echo)}`;
+                    }
+                    eventClass = 'pong';
                     break;
-                    
+
                 default:
                     title = `📥 未知类型: ${type}`;
                     content = JSON.stringify(data, null, 2);
-                    addMessage('system', title, content, timestamp, 'unknown');
+                    eventClass = 'unknown';
             }
-            
+
+            // 添加时间戳和请求ID到内容
+            if (requestId) {
+                content += `\n\n请求ID: ${requestId}`;
+            }
+            content += `\n时间: ${new Date(timestamp).toLocaleTimeString()}`;
+
+            addMessage(messageType_class, title, content, timestamp, eventClass);
+
             messageCount++;
             totalMessagesSpan.textContent = messageCount;
             updateLastActivity();
         }
-        
+
         // 添加发送的消息到日志
         function addSentMessage(type, data, requestId) {
-            const title = `📤 发送 [${type}]${requestId ? ' req:' + requestId : ''}`;
-            const content = JSON.stringify(data, null, 2);
+            const title = `📤 发送 [${type}]`;
+            let content = JSON.stringify(data, null, 2);
+            if (requestId) {
+                content += `\n\n请求ID: ${requestId}`;
+            }
             addMessage('user', title, content, new Date().toISOString(), 'sent');
         }
-        
+
         // 添加系统消息
         function addSystemMessage(title, content) {
             addMessage('system', title, content, new Date().toISOString(), 'system');
         }
-        
+
         // 添加错误消息
         function addErrorMessage(title, content) {
             addMessage('error', title, content, new Date().toISOString(), 'error');
         }
-        
+
         // 添加消息到界面
         function addMessage(role, title, content, timestamp, eventType) {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${role}-message`;
-            
+
             const headerDiv = document.createElement('div');
             headerDiv.className = 'message-header';
-            
-            const timeSpan = document.createElement('span');
-            timeSpan.textContent = new Date(timestamp).toLocaleTimeString();
-            
+
+            const leftSpan = document.createElement('span');
+
             const typeSpan = document.createElement('span');
             typeSpan.className = `event-type event-type-${eventType}`;
             typeSpan.textContent = eventType.toUpperCase();
-            
-            headerDiv.appendChild(typeSpan);
-            headerDiv.appendChild(document.createTextNode(` ${title} `));
+
+            leftSpan.appendChild(typeSpan);
+            leftSpan.appendChild(document.createTextNode(` ${title}`));
+
+            const timeSpan = document.createElement('span');
+            timeSpan.className = 'timestamp';
+            timeSpan.textContent = new Date(timestamp).toLocaleTimeString();
+
+            headerDiv.appendChild(leftSpan);
             headerDiv.appendChild(timeSpan);
-            
+
             const contentDiv = document.createElement('div');
             contentDiv.className = 'message-content';
             contentDiv.textContent = content;
-            
+
             messageDiv.appendChild(headerDiv);
             messageDiv.appendChild(contentDiv);
-            
+
             messagesDiv.appendChild(messageDiv);
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
         }
-        
+
         // 清空消息
         function clearMessages() {
             messagesDiv.innerHTML = '';
             messageCount = 0;
             totalMessagesSpan.textContent = '0';
+            currentPhaseSpan.textContent = '-';
         }
-        
+
         // 更新最后活动时间
         function updateLastActivity() {
             lastActivitySpan.textContent = new Date().toLocaleTimeString();
         }
-        
-        // 生成请求ID
-        function generateRequestId() {
-            return 'req_' + Math.random().toString(36).substr(2, 9);
-        }
-        
+
         // 获取服务器状态
         async function fetchStatus() {
             try {
@@ -562,43 +898,13 @@
                 console.error('获取状态失败', e);
             }
         }
-        
+
         // 定期更新状态
         setInterval(fetchStatus, 5000);
-        
+
         // 初始获取状态
         fetchStatus();
     </script>
 </body>
+
 </html>
-
-<!-- ✅ 新协议的所有功能
-PING/PONG：心跳测试
-
-START：开始新对话
-
-MESSAGE：发送消息（支持流式响应）
-
-CANCEL：取消操作（预留）
-
-✅ 可视化特性
-不同颜色区分消息类型
-
-显示事件类型标签
-
-实时统计信息
-
-连接状态指示
-
-服务器状态监控
-
-✅ 使用说明
-输入对话ID
-
-点击"连接"
-
-选择消息类型
-
-发送消息
-
-查看流式响应 -->
