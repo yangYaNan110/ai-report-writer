@@ -53,9 +53,10 @@ class ReportAgent:
         
         # 基础指令
         base_instructions = [
-            "你是一个专业的报告写作助手",
+            "你是一个专业的报告写作助手，也是意图分析专家",
+            "你可以在不同任务间切换：报告写作、意图分析、意见提取、过渡语生成",
+            "根据当前任务选择合适的技能指南",
             "回答要专业、客观、简洁",
-            "使用Markdown格式组织内容",
             "不确定时如实告知，不编造信息",
             "保持友好的对话风格",
         ]
@@ -113,7 +114,7 @@ class ReportAgent:
             # 当前文件在: agents/report_agent.py
             # 项目根目录: agents/../../ (即项目根目录)
             current_file = Path(__file__).resolve()  # agents/report_agent.py
-            project_root = current_file.parent.parent.parent  # 项目根目录
+            project_root = current_file.parent.parent  # 项目根目录
             skills_dir = project_root / "skills"
             
             # 检查skills目录是否存在
@@ -285,9 +286,9 @@ if __name__ == "__main__":
         
         #测试5: 测试skill是否调用
         # print("\n")
-        agent4 = ReportAgent(skill_names=["report-writing"])
+        agent4 = ReportAgent(skill_names=["report-writing", "data-presentation", "intent-analysis", "suggestion-extraction", "transition-generation", "tool-usage-strategy"])
         response4 = await agent4.chat("请写一段关于'人工智能在医疗领域应用'的报告开头段落。要求：这是一份正式的技术报告，请遵循报告写作规范")
-        print(f"Agent (with skills): {response4[:100]}...")
+        print(f"Agent (with skills): {response4[:500]}...")
 
         
         
