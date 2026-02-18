@@ -35,6 +35,11 @@ class ConversationStore:
         self.db = db
         self.thread_id = thread_id
         self.conversation: Optional[Conversation] = None
+
+        # ===== 新增：交互状态字段 =====
+        self.interaction_mode: str = 'normal'  # 'normal', 'awaiting_feedback', 'processing'
+        self.pending_type: Optional[str] = None  # 'outline', 'section'
+        self.pending_item: Optional[Dict] = None  # 待确认的内容
     
     # ==================== 私有加载和保存方法 ====================
     
@@ -161,6 +166,32 @@ class ConversationStore:
             for m in recent
         ]
     
+
+
+    async def analyze_user_request(self, request: str) -> str:
+        '''分析用户需求,让ai先理解用户想要什么'''
+        agent = websocket_controller.get_agent()
+        prompt = f"""
+        用户想要写一份报告，需求是：「{request}」
+        请分析这个需求，用一两句话说明你的理解。
+        不需要生成内容，只需要确认理解了用户意图。
+        语气要自然、亲切。
+
+        你的理解：
+        """
+        try:
+            # 调用agent分析（非流式）
+            async for response in agent.run([{"role": "user", "content": prompt}], stream=False):
+                if response.get("type") == "complete":
+                    content = response.get("content", "")
+                    print(f"📥 Agent分析结果: {content[:200]}...")
+                    return content.strip()
+        except Exception as e:
+            print(f"❌ 调用Agent失败: {e}")
+            return f"好的，我理解您需要一份关于{request}的报告."
+        return f"好的，我理解您需要一份关于{request}的报告。"
+
+
     # ==================== 段落操作 ====================
     
     async def add_section(

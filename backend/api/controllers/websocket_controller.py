@@ -107,6 +107,7 @@ async def handle_websocket_message(
     event_type = data.get("type")
     event_data = data.get("data", {})
     request_id = data.get("request_id")
+    print("消息类型...",event_type)
     
     if event_type == EventType.PING:
         await handle_ping(websocket, thread_id, event_data, request_id)
@@ -195,32 +196,80 @@ async def handle_start(
                 timestamp=datetime.now(timezone.utc)
             ).to_dict())
         else:
-            # 新对话，生成报告（使用流式模式）
-            async for chunk in conv.generate_report_stream(
-                topic=start_data.title or "新对话",
-            ):
-                print("handle_start chunk:", chunk)  # 调试输出，查看流式返回的数据结构
-                if chunk["type"] == "outline_complete":
-                    # 大纲完成，发送确认提示
-                    await websocket.send_json(ServerEvent(
-                        type=EventType.PROMPT,
-                        data=PromptEventData(
-                            question=chunk["pending_question"],
-                            options=chunk["pending_options"]
-                        ).to_dict(),
-                        request_id=request_id
-                    ).to_dict())
-                elif chunk["type"] == "error":
-                    await send_error(websocket, thread_id, "GENERATE_ERROR", chunk["message"], request_id=request_id)
-                else:
-                    # 流式内容
+            print("&0" * 50)
+            # 1. 先让ai理解需求
+            await websocket.send_json(ServerEvent(
+                type=EventType.CHUNK,
+                data=ChunkEventData(
+                    text="正在理解您的需求...\n",
+                    section_id=None,
+                    done=False
+                ).to_dict(),  
+                section="thinking",
+                request_id=request_id,
+                timestamp=datetime.now(timezone.utc)
+            ).to_dict())  # 发送空事件，触发前端加载状态
+            print("&1" * 50)
+            # 2. 分析需求
+            analysis = await conv.analyze_user_request(start_data.title or "新对话")
+            print("分析结果:", analysis)  # 调试输出，查看分析结果
+            await websocket.send_json(ServerEvent(
+                type=EventType.CHUNK,
+                data=ChunkEventData(
+                    text=analysis + "\n",
+                    section_id=None,
+                    done=False
+                ).to_dict(),
+                section="thinking",
+                request_id=request_id,
+                timestamp=datetime.now(timezone.utc)
+            ).to_dict())  
+            print("&2" * 50)
+            # 3. 提示开始规划大纲
+            await websocket.send_json(ServerEvent(
+                type=EventType.CHUNK,
+                data=ChunkEventData(
+                    text="现在为您规划大纲：\n",
+                    section_id=None,
+                    done=False
+                ).to_dict(),
+                section="thinking",
+                request_id=request_id,
+                timestamp=datetime.now(timezone.utc)
+            ).to_dict()) 
+            # 4. 生成大纲(流式)
+            sections = []
+            async for chunk in conv.generate_report_stream(start_data.title):
+                if chunk.get("type") == "chunk":
                     await websocket.send_json(ServerEvent(
                         type=EventType.CHUNK,
-                        data=chunk,
-                        request_id=request_id
+                        data=ChunkEventData(
+                            text=chunk.get("content", ""),
+                            done=False
+                        ).to_dict(),
+                        section="outline",
+                        request_id=request_id,
+                        timestamp=datetime.now(timezone.utc)
                     ).to_dict())
-            
+                elif chunk.get("type") == "outline_complete":
+                    sections = chunk.get("sections", [])
+            # 5. 设置等待反馈状态
+            conv.interaction_mode = 'awaiting_feedback' # 进入等待反馈模式
+            conv.pending_type = 'outline'  # 待确认的是大纲
+            conv.pending_item = {                          # 保存大纲信息
+                'sections': sections,
+                'title': start_data.title or "新对话"
+            }
+            # 6. 询问是否满意（使用普通消息，不是选项按钮）
+            await websocket.send_json(ServerEvent(
+                type=EventType.MESSAGE,
+                data={"content": "大纲已生成，您觉得怎么样？"},
+                request_id=request_id,
+                timestamp=datetime.now(timezone.utc)
+            ).to_dict())
+           
     except Exception as e:
+        logger.error(f"❌ 开始对话失败: {e}")
         await send_error(websocket, thread_id, "START_FAILED", str(e), request_id=request_id)
 
 async def handle_message(
@@ -256,49 +305,57 @@ async def handle_message(
             request_id=request_id,
             timestamp=datetime.now(timezone.utc)
         ).to_dict())
+        # ===== 新增：判断是否在等待反馈 =====
+        if conv.interaction_mode == 'awaiting_feedback':
+            # 调用意图分析
+            await handle_feedback(websocket,thread_id,conv,msg_data.content,request_id)
+        else:
+            # 正常对话，调用agent生成恢复
+            await generate_normal_response(websocket,thread_id,conv,msg_data.content,request_id)
         
+
         # 获取Agent回复
-        agent = get_agent()
-        messages_for_agent = conv.get_recent_messages(10)
+        # agent = get_agent()
+        # messages_for_agent = conv.get_recent_messages(10)
         
         # 流式回复
-        full_response = ""
-        message_id = str(uuid.uuid4())
+        # full_response = ""
+        # message_id = str(uuid.uuid4())
         
-        async for chunk in agent.run(messages_for_agent, stream=True):
-            if chunk.get("type") == "chunk":
-                text = chunk.get("content", "")
-                full_response += text
+        # async for chunk in agent.run(messages_for_agent, stream=True):
+        #     if chunk.get("type") == "chunk":
+        #         text = chunk.get("content", "")
+        #         full_response += text
                 
-                await websocket.send_json(ServerEvent(
-                    type=EventType.CHUNK,
-                    data=ChunkEventData(
-                        text=text,
-                        done=False,
-                        message_id=message_id
-                    ).to_dict(),
-                    request_id=request_id,
-                    timestamp=datetime.now(timezone.utc)
-                ).to_dict())
+        #         await websocket.send_json(ServerEvent(
+        #             type=EventType.CHUNK,
+        #             data=ChunkEventData(
+        #                 text=text,
+        #                 done=False,
+        #                 message_id=message_id
+        #             ).to_dict(),
+        #             request_id=request_id,
+        #             timestamp=datetime.now(timezone.utc)
+        #         ).to_dict())
                 
-            elif chunk.get("type") == "complete":
-                # 保存AI回复
-                assistant_msg = await conv.add_message(
-                    role=MessageRole.ASSISTANT,
-                    content=full_response,
-                    metadata=chunk.get("metadata", {})
-                )
+        #     elif chunk.get("type") == "complete":
+        #         # 保存AI回复
+        #         assistant_msg = await conv.add_message(
+        #             role=MessageRole.ASSISTANT,
+        #             content=full_response,
+        #             metadata=chunk.get("metadata", {})
+        #         )
                 
-                await websocket.send_json(ServerEvent(
-                    type=EventType.COMPLETE,
-                    data=CompleteEventData(
-                        message_id=assistant_msg.id,
-                        full_content=full_response,
-                        metadata=chunk.get("metadata", {})
-                    ).to_dict(),
-                    request_id=request_id,
-                    timestamp=datetime.now(timezone.utc)
-                ).to_dict())
+        #         await websocket.send_json(ServerEvent(
+        #             type=EventType.COMPLETE,
+        #             data=CompleteEventData(
+        #                 message_id=assistant_msg.id,
+        #                 full_content=full_response,
+        #                 metadata=chunk.get("metadata", {})
+        #             ).to_dict(),
+        #             request_id=request_id,
+        #             timestamp=datetime.now(timezone.utc)
+        #         ).to_dict())
                 
     except Exception as e:
         logger.error(f"❌ 处理消息失败: {e}")
@@ -612,3 +669,149 @@ async def get_conversation_info(thread_id: str):
             return {"thread_id": thread_id, "active": False, **info}
         else:
             return {"thread_id": thread_id, "active": False, "exists": False}
+        
+
+async def handle_feedback(
+    websocket: WebSocket,
+    thread_id: str,
+    conv: ConversationStore,
+    user_message: str,
+    request_id: Optional[str] = None
+):
+    """处理用户反馈（肯定/修改等）"""
+    
+    # 显示正在分析
+    await websocket.send_json(ServerEvent(
+        type=EventType.CHUNK,
+        data=ChunkEventData(
+            text="让我理解一下您的反馈...\n",
+            section_id=None,
+            done=False
+        ).to_dict(),
+        request_id=request_id,
+        timestamp=datetime.now(timezone.utc)
+    ).to_dict())
+    
+    # 这里后续会调用意图分析 Agent
+    # 现在先简单处理
+    if any(word in user_message for word in ['可以', '好的', '继续', '满意', '没问题']):
+        # 肯定反馈
+        await websocket.send_json(ServerEvent(
+            type=EventType.CHUNK,
+            data=ChunkEventData(
+                text="好的，那我们继续下一步。\n",
+                section_id=None,
+                done=False
+            ).to_dict(),
+            request_id=request_id,
+            timestamp=datetime.now(timezone.utc)
+        ).to_dict())
+        
+        # 重置状态
+        conv.interaction_mode = 'normal'
+        conv.pending_type = None
+        conv.pending_item = None
+        
+        # 根据 pending_type 执行下一步
+        if conv.pending_type == 'outline':
+            # TODO: 开始写作
+            pass
+            
+    else:
+        # 修改反馈
+        await websocket.send_json(ServerEvent(
+            type=EventType.CHUNK,
+            data=ChunkEventData(
+                text=f"我理解了，您希望修改。请稍等...\n",
+                section_id=None,
+                done=False
+            ).to_dict(),
+            request_id=request_id,
+            timestamp=datetime.now(timezone.utc)
+        ).to_dict())
+
+
+
+
+
+
+async def generate_normal_response(
+    websocket: WebSocket,
+    thread_id: str,
+    conv: ConversationStore,
+    user_message: str,
+    request_id: Optional[str] = None
+):
+    """正常对话，调用 Agent 生成回复（非等待反馈状态）"""
+    
+    # 1. 获取 Agent
+    agent = get_agent()
+    
+    # 2. 准备消息历史（最近10条）
+    messages_for_agent = conv.get_recent_messages(10)
+    
+    # 3. 流式生成回复
+    full_response = ""
+    message_id = str(uuid.uuid4())
+    
+    try:
+        # 先发送一个 thinking 提示
+        await websocket.send_json(ServerEvent(
+            type=EventType.CHUNK,
+            data=ChunkEventData(
+                text="正在思考",
+                done=False,
+                message_id=message_id
+            ).to_dict(),
+            request_id=request_id,
+            timestamp=datetime.now(timezone.utc)
+        ).to_dict())
+        
+        # 调用 Agent 流式生成
+        async for chunk in agent.run(messages_for_agent, stream=True):
+            if chunk.get("type") == "chunk":
+                text = chunk.get("content", "")
+                full_response += text
+                
+                await websocket.send_json(ServerEvent(
+                    type=EventType.CHUNK,
+                    data=ChunkEventData(
+                        text=text,
+                        done=False,
+                        message_id=message_id
+                    ).to_dict(),
+                    request_id=request_id,
+                    timestamp=datetime.now(timezone.utc)
+                ).to_dict())
+                
+            elif chunk.get("type") == "complete":
+                # 保存 AI 回复
+                assistant_msg = await conv.add_message(
+                    role=MessageRole.ASSISTANT,
+                    content=full_response,
+                    metadata=chunk.get("metadata", {})
+                )
+                
+                # 发送完成事件
+                await websocket.send_json(ServerEvent(
+                    type=EventType.COMPLETE,
+                    data=CompleteEventData(
+                        message_id=assistant_msg.id,
+                        full_content=full_response,
+                        metadata=chunk.get("metadata", {})
+                    ).to_dict(),
+                    request_id=request_id,
+                    timestamp=datetime.now(timezone.utc)
+                ).to_dict())
+                
+                logger.info(f"✅ Agent回复完成 {thread_id}: {len(full_response)}字符")
+                
+    except Exception as e:
+        logger.error(f"❌ 生成回复失败: {e}")
+        await send_error(
+            websocket, 
+            thread_id, 
+            "GENERATE_ERROR", 
+            f"生成回复失败: {str(e)}",
+            request_id=request_id
+        )

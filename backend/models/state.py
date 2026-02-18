@@ -144,6 +144,10 @@ class Conversation:
     # 扩展字段
     metadata: Dict[str, Any] = field(default_factory=dict)  # 其他元数据
     
+    # 新增：交互状态（用于持久化）
+    interaction_mode: str = 'normal'
+    pending_type: Optional[str] = None
+    # pending_item 太大不适合存数据库，可以在 ConversationStore 中管理
     def to_dict(self) -> Dict[str, Any]:
         """转换为字典（用于序列化）"""
         return {
@@ -161,7 +165,9 @@ class Conversation:
             "edit_target_id": self.edit_target_id,
             "edit_instruction": self.edit_instruction,
             "paused_section_id": self.paused_section_id,
-            "metadata": self.metadata
+            "metadata": self.metadata,
+            "interaction_mode": self.interaction_mode,
+            "pending_type": self.pending_type
         }
     
     @classmethod
@@ -182,5 +188,7 @@ class Conversation:
             edit_target_id=data.get("edit_target_id"),
             edit_instruction=data.get("edit_instruction"),
             paused_section_id=data.get("paused_section_id"),
-            metadata=data.get("metadata", {})
+            metadata=data.get("metadata", {}),
+            interaction_mode=data.get("interaction_mode", "normal"),
+            pending_type=data.get("pending_type", None)
         )

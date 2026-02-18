@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI报告写作助手 - 测试</title>
+    <link rel="stylesheet" href="test-style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- 头部 -->
+        <div class="header">
+            <h1>📝 AI报告写作助手</h1>
+            <div class="connection-area">
+                <input type="text" id="threadId" class="thread-input" placeholder="对话ID" value="test-123">
+                <button id="connectBtn" class="btn btn-primary">连接</button>
+                <button id="disconnectBtn" class="btn btn-danger" disabled>断开</button>
+                <span id="connectionStatus" class="status-badge status-disconnected">未连接</span>
+            </div>
+        </div>
+        
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <!-- 左侧对话历史 -->
+            <div class="chat-history">
+                <div class="history-header">
+                    💬 对话历史
+                </div>
+                <div id="messagesContainer" class="messages-container">
+                    <!-- 欢迎界面 -->
+                    <div id="welcomeScreen" class="welcome-screen">
+                        <div class="welcome-title">👋 你好！我是你的AI报告写作助手</div>
+                        <p>我可以帮你撰写各种类型的报告：技术报告、市场分析、学术综述等</p>
+                        <p>点击下面的示例开始，或直接输入你的需求</p>
+                        <div class="examples" id="examplePrompts"></div>
+                    </div>
+                </div>
+                
+                <!-- 输入区 -->
+                <div class="input-area">
+                    <div class="input-container">
+                        <textarea id="messageInput" placeholder="输入你的报告需求... (Shift + Enter 换行，Enter 发送)" rows="3"></textarea>
+                        <button id="sendBtn" class="send-btn" disabled>发送</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 右侧报告预览 -->
+            <div class="report-preview">
+                <div class="preview-header">
+                    📄 报告预览
+                </div>
+                <div id="reportContent" class="preview-content">
+                    <div class="preview-placeholder">
+                        等待生成报告...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="test-store.js"></script>
+    <script src="test-app.js"></script>
+</body>
+</html>

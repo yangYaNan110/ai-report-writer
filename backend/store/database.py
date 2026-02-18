@@ -59,13 +59,13 @@ class Database:
         if not self.connection:
             await self.connect()
         
-        print(f"📝 [连接 {self.connection_id}] 执行SQL: {sql[:60]}...")
-        print(f"   参数: {params}")
+        # print(f"📝 [连接 {self.connection_id}] 执行SQL: {sql[:60]}...")
+        # print(f"   参数: {params}")
         cursor = await self.connection.execute(sql, params)
 
-        print(f"   执行完成，准备commit...")  # 添加这行
+        # print(f"   执行完成，准备commit...")  # 添加这行
         await self.connection.commit()
-        print(f"   ✅ commit完成")  # 添加这行
+        # print(f"   ✅ commit完成")  # 添加这行
         return cursor
     
     async def fetch_one(self, sql: str, params: tuple = ()) -> Optional[dict]:
@@ -126,15 +126,15 @@ class Database:
         
         # 开发环境：直接删除旧表重建
         # 注意：这会丢失所有数据，仅适合开发阶段
-        print("🔄 重建数据库表结构...")
+        # print("🔄 重建数据库表结构...")
         
         # 删除旧表（注意顺序，因为有外键约束）
         # 只在开发环境且明确指定时才重建
-        # rebuild = settings.REBUILD_DB
-        # if rebuild:
-        #     await self.execute("DROP TABLE IF EXISTS sections")
-        #     await self.execute("DROP TABLE IF EXISTS messages")
-        #     await self.execute("DROP TABLE IF EXISTS conversations")
+        rebuild = settings.REBUILD_DB
+        if rebuild:
+            await self.execute("DROP TABLE IF EXISTS sections")
+            await self.execute("DROP TABLE IF EXISTS messages")
+            await self.execute("DROP TABLE IF EXISTS conversations")
         
         # 创建conversations表
         await self.execute("""
@@ -327,13 +327,13 @@ class Database:
     
     async def save_message(self, thread_id: str, message: Dict[str, Any]) -> None:
         """保存单条消息"""
-        print(f"\n🔵 [DEBUG] save_message 被调用")
-        print(f"   thread_id: {thread_id}")
-        print(f"   message id: {message['id']}")
-        print(f"   message role: {message['role']}")
-        print(f"   message content: {message['content'][:30]}...")
-        print(f"\n🔵 [DEBUG] save_message 被调用 [连接 {self.connection_id}]")
-        print("=" * 30)
+        # print(f"\n🔵 [DEBUG] save_message 被调用")
+        # print(f"   thread_id: {thread_id}")
+        # print(f"   message id: {message['id']}")
+        # print(f"   message role: {message['role']}")
+        # print(f"   message content: {message['content'][:30]}...")
+        # print(f"\n🔵 [DEBUG] save_message 被调用 [连接 {self.connection_id}]")
+        # print("=" * 30)
         # //test-123
         # //b664cbe4-84a2-4bcd-94fb-c7a23af92d62
         # //连接 1d450c2a
@@ -343,19 +343,19 @@ class Database:
 
         # 处理 datetime：转换为 ISO 格式字符串
         created_at = message.get('created_at', datetime.now(timezone.utc))
-        print(f"   created_at 类型: {type(created_at)}")
-        print(f"   created_at 值: {created_at}")
+        # print(f"   created_at 类型: {type(created_at)}")
+        # print(f"   created_at 值: {created_at}")
 
         # 检查所有参数类型
-        params = [
-            message['id'],
-            thread_id,
-            message['role'],
-            message['content'],
-            created_at,
-            json.dumps(message.get('metadata', {}), default=json_serializer)
-        ]
-        print(f"   所有参数类型: {[type(p) for p in params]}")
+        # params = [
+        #     message['id'],
+        #     thread_id,
+        #     message['role'],
+        #     message['content'],
+        #     created_at,
+        #     json.dumps(message.get('metadata', {}), default=json_serializer)
+        # ]
+        # print(f"   所有参数类型: {[type(p) for p in params]}")
 
 
         if isinstance(created_at, datetime):
@@ -365,7 +365,7 @@ class Database:
             "SELECT COUNT(*) as count FROM messages WHERE conversation_id = ?",
             [thread_id]
         )
-        print(f"   保存前消息数: {before_count['count'] if before_count else 0}")
+        # print(f"   保存前消息数: {before_count['count'] if before_count else 0}")
       
         
         try:
@@ -384,13 +384,13 @@ class Database:
                     json.dumps(message.get('metadata', {}), default=json_serializer)
                 ]
             )
-            print(f"   ✅ INSERT 成功")
+            # print(f"   ✅ INSERT 成功")
 
             # 添加这些行（强制同步并验证）
-            print(f"   强制checkpoint...")
+            # print(f"   强制checkpoint...")
             await self.connection.execute("PRAGMA wal_checkpoint")
             
-            print(f"   立即验证...")
+            # print(f"   立即验证...")
             verification = await self.fetch_one(
                 "SELECT * FROM messages WHERE id = ?",
                 (message['id'],)
@@ -423,11 +423,11 @@ class Database:
                 print(f"   ❌ UPDATE 也失败: {e2}")
         
         # 验证保存后的数量
-        after_count = await self.fetch_one(
-            "SELECT COUNT(*) as count FROM messages WHERE conversation_id = ?",
-            [thread_id]
-        )
-        print(f"   保存后消息数: {after_count['count'] if after_count else 0}")
+        # after_count = await self.fetch_one(
+        #     "SELECT COUNT(*) as count FROM messages WHERE conversation_id = ?",
+        #     [thread_id]
+        # )
+        # print(f"   保存后消息数: {after_count['count'] if after_count else 0}")
     async def save_messages(self, thread_id: str, messages: List[Dict[str, Any]]) -> None:
         """批量保存消息"""
         if not messages:

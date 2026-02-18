@@ -5,7 +5,7 @@ WebSocket事件模型
 
 from enum import Enum
 from typing import Optional, Any, Dict, List
-from datetime import datetime
+from datetime import datetime, timezone
 from dataclasses import dataclass, field
 
 
@@ -80,8 +80,9 @@ class ServerEvent:
     """服务端发送的事件基类"""
     type: EventType                         # 事件类型
     data: Dict[str, Any]                    # 事件数据
-    timestamp: datetime = field(default_factory=datetime.utcnow)  # 事件时间
-    request_id: Optional[str] = None         # 请求ID
+    timestamp: datetime = field(default_factory=datetime.now(timezone.utc))  # 事件时间
+    request_id: Optional[str] = None    
+    section: Optional[str] = None     # 当前的内容类型
     
     def to_dict(self) -> Dict[str, Any]:
         """转换为字典（用于发送）"""
@@ -89,7 +90,8 @@ class ServerEvent:
             "type": self.type.value,
             "data": self.data,
             "timestamp": self.timestamp.isoformat(),
-            "request_id": self.request_id
+            "request_id": self.request_id,
+            "section": self.section
         }
     
     @classmethod
@@ -98,8 +100,9 @@ class ServerEvent:
         return cls(
             type=EventType(data["type"]),
             data=data.get("data", {}),
-            timestamp=datetime.fromisoformat(data["timestamp"]) if data.get("timestamp") else datetime.utcnow(),
-            request_id=data.get("request_id")
+            timestamp=datetime.fromisoformat(data["timestamp"]) if data.get("timestamp") else datetime.now(timezone.utc),
+            request_id=data.get("request_id"),
+            section=data.get("section")
         )
 
 
