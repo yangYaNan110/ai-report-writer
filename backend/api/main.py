@@ -11,7 +11,7 @@ import uvicorn
 from contextlib import asynccontextmanager
 from loguru import logger
 
-from store.database import db, init_db, get_db
+# from store.database import db, init_db, get_db
 from config.settings import settings
 from api.controllers import websocket_controller  # 导入WebSocket控制器（阶段1.2）
 from agents.report_agent import ReportAgent  # 导入ReportAgent
@@ -29,26 +29,27 @@ async def lifespan(app: FastAPI):
     """
     logger.info("🚀 应用启动中...")
     # 启动时
-    await db.connect()
-    await init_db()
+    # await db.connect()
+    # await init_db()
     logger.info("✅ 数据库就绪")
     
 
     # 2. 初始化 Agent（全局单例）
     global agent
     # agent = ReportAgent()
-    agent = ReportAgent(skill_names=["report-writing", "data-presentation", "intent-analysis", "suggestion-extraction", "transition-generation", "tool-usage-strategy"])
+    agent = ReportAgent(skill_names=[ "report-assistant"])
 
-    logger.info("🤖 Agent 初始化完成")
 
     websocket_controller.set_agent(agent)  # 将Agent实例传递给WebSocket控制器
+    logger.info("🤖 Agent 初始化完成")
+
 
     yield
     
     
     # 关闭时
     logger.info("👋 应用关闭中...")
-    await db.close()
+    # await db.close()
     logger.info("✅ 数据库连接已关闭")
 
 # 创建FastAPI应用
@@ -88,8 +89,7 @@ async def root():
         "database": "sqlite",
     }
 
-@app.get("/health")
-async def health_check(db_session = Depends(get_db)):
+
     """健康检查接口（带数据库检查）"""
     try:
         # 简单查询测试数据库

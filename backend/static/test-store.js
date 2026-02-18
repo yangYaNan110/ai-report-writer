@@ -133,7 +133,6 @@ class AppStore {
         
         ws.onmessage = (event) => {
             try {
-                console.log(event.data,"收到消息...");
                 
                 const data = JSON.parse(event.data);
 
@@ -210,7 +209,9 @@ class AppStore {
      * @param {Object} data - 接收到的消息
      */
     #dispatch(data) {
-        const { type, data: eventData } = data;
+        console.log(data,"001....");
+        
+        const { type, content: eventData } = data;
         
         const handlers = {
             'sync': () => this.#handleSync(eventData),
@@ -247,9 +248,7 @@ class AppStore {
         }
     }
     
-    #handleChunk(eventData) {
-        const { text } = eventData;
-        
+    #handleChunk(text) {
         this.setState(prev => {
             const newContent = prev.currentStreamingContent + text;
             
