@@ -4456,3 +4456,683 @@
 2026-02-17 15:58:46.718 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-123
 2026-02-17 15:58:46.720 | INFO     | api.controllers.websocket_controller:send_sync_state:533 - 📜 发送历史消息 4 条给 test-123
 2026-02-17 15:58:46.720 | INFO     | api.controllers.websocket_controller:send_sync_state:533 - 📜 发送历史消息 4 条给 test-123
+2026-02-17 16:20:24.664 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-123
+2026-02-17 16:20:24.664 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-123
+2026-02-17 16:20:24.664 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-123
+2026-02-17 16:20:24.664 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-123
+2026-02-17 16:20:24.763 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 16:20:24.763 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 16:20:24.780 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 16:20:24.780 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 16:20:27.059 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 16:20:27.059 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 16:20:27.062 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 16:20:27.062 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 16:20:27.062 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 16:20:27.062 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 16:20:27.063 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 16:20:27.063 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 16:22:50.701 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 16:22:50.701 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 16:22:50.702 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 16:22:50.702 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 16:22:52.309 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 16:22:52.309 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 16:22:52.312 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 16:22:52.312 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 16:22:52.313 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 16:22:52.313 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 16:22:52.313 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 16:22:52.313 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 16:25:45.397 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 16:25:45.397 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 16:25:45.397 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 16:25:45.397 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 16:29:02.014 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 16:29:02.014 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 16:29:02.024 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 16:29:02.024 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 16:29:02.025 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 16:29:02.025 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 16:29:02.025 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 16:29:02.025 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 16:29:02.631 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 16:29:02.631 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 16:29:02.632 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 16:29:02.632 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 16:56:55.162 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 16:56:55.162 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 16:56:55.170 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 16:56:55.170 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 16:56:55.170 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 16:56:55.170 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 16:56:55.171 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 16:56:55.171 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 16:57:48.933 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 16:57:48.933 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 16:57:48.935 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 16:57:48.935 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 16:57:50.800 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 16:57:50.800 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 16:57:50.803 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 16:57:50.803 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 16:57:50.804 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 16:57:50.804 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 16:57:50.804 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 16:57:50.804 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 16:57:51.912 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 16:57:51.912 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 16:57:51.913 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 16:57:51.913 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 16:57:54.451 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 16:57:54.451 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 16:57:54.453 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 16:57:54.453 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 16:57:54.454 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 16:57:54.454 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 16:57:54.454 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 16:57:54.454 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 16:58:05.132 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 16:58:05.132 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 16:58:05.133 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 16:58:05.133 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 16:58:06.517 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 16:58:06.517 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 16:58:06.520 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 16:58:06.520 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 16:58:06.520 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 16:58:06.520 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 16:58:06.520 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 16:58:06.520 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 17:01:30.113 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 17:01:30.113 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 17:01:30.115 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 17:01:30.115 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 17:01:31.597 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 17:01:31.597 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 17:01:31.600 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 17:01:31.600 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 17:01:31.600 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 17:01:31.600 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 17:01:31.601 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 17:01:31.601 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 17:01:42.778 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 17:01:42.778 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 17:01:42.779 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 17:01:42.779 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 17:01:48.309 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 17:01:48.309 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 17:01:48.312 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 17:01:48.312 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 17:01:48.312 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 17:01:48.312 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 17:01:48.312 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 17:01:48.312 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 17:02:22.859 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-123 来自 127.0.0.1
+2026-02-17 17:02:22.859 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-123 来自 127.0.0.1
+2026-02-17 17:02:22.864 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-123
+2026-02-17 17:02:22.864 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-123
+2026-02-17 17:02:22.864 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-123
+2026-02-17 17:02:22.864 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-123
+2026-02-17 17:02:22.867 | INFO     | api.controllers.websocket_controller:send_sync_state:540 - 📜 发送历史消息 4 条给 test-123
+2026-02-17 17:02:22.867 | INFO     | api.controllers.websocket_controller:send_sync_state:540 - 📜 发送历史消息 4 条给 test-123
+2026-02-17 17:03:43.368 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-123: start
+2026-02-17 17:03:43.368 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-123: start
+2026-02-17 17:04:13.371 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-123
+2026-02-17 17:04:13.371 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-123
+2026-02-17 17:04:13.372 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-123
+2026-02-17 17:04:13.372 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-123
+2026-02-17 17:05:04.396 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 17:05:04.396 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 17:05:04.397 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 17:05:04.397 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 17:05:11.138 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 17:05:11.138 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 17:05:11.141 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 17:05:11.141 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 17:05:11.141 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 17:05:11.141 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 17:05:11.142 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 17:05:11.142 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 17:05:12.060 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-123 来自 127.0.0.1
+2026-02-17 17:05:12.060 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-123 来自 127.0.0.1
+2026-02-17 17:05:12.064 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-123
+2026-02-17 17:05:12.064 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-123
+2026-02-17 17:05:12.065 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-123
+2026-02-17 17:05:12.065 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-123
+2026-02-17 17:05:12.066 | INFO     | api.controllers.websocket_controller:send_sync_state:543 - 📜 发送历史消息 4 条给 test-123
+2026-02-17 17:05:12.066 | INFO     | api.controllers.websocket_controller:send_sync_state:543 - 📜 发送历史消息 4 条给 test-123
+2026-02-17 17:05:27.690 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-123: start
+2026-02-17 17:05:27.690 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-123: start
+2026-02-17 17:05:56.023 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-123: start
+2026-02-17 17:05:56.023 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-123: start
+2026-02-17 17:06:08.469 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-123: start
+2026-02-17 17:06:08.469 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-123: start
+2026-02-17 17:06:40.657 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-123
+2026-02-17 17:06:40.657 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-123
+2026-02-17 17:06:40.657 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-123
+2026-02-17 17:06:40.657 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-123
+2026-02-17 17:06:43.904 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-123 来自 127.0.0.1
+2026-02-17 17:06:43.904 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-123 来自 127.0.0.1
+2026-02-17 17:06:43.906 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-123
+2026-02-17 17:06:43.906 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-123
+2026-02-17 17:06:43.906 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-123
+2026-02-17 17:06:43.906 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-123
+2026-02-17 17:06:43.907 | INFO     | api.controllers.websocket_controller:send_sync_state:543 - 📜 发送历史消息 4 条给 test-123
+2026-02-17 17:06:43.907 | INFO     | api.controllers.websocket_controller:send_sync_state:543 - 📜 发送历史消息 4 条给 test-123
+2026-02-17 17:06:46.327 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-123: start
+2026-02-17 17:06:46.327 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-123: start
+2026-02-17 17:07:00.789 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-123: start
+2026-02-17 17:07:00.789 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-123: start
+2026-02-17 17:07:48.066 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-123
+2026-02-17 17:07:48.066 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-123
+2026-02-17 17:07:48.066 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-123
+2026-02-17 17:07:48.066 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-123
+2026-02-17 17:07:48.166 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 17:07:48.166 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 17:07:48.166 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 17:07:48.166 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 17:07:55.407 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 17:07:55.407 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 17:07:55.410 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 17:07:55.410 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 17:07:55.411 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 17:07:55.411 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 17:07:55.411 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 17:07:55.411 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 17:07:57.082 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-123 来自 127.0.0.1
+2026-02-17 17:07:57.082 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-123 来自 127.0.0.1
+2026-02-17 17:07:57.085 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-123
+2026-02-17 17:07:57.085 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-123
+2026-02-17 17:07:57.086 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-123
+2026-02-17 17:07:57.086 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-123
+2026-02-17 17:07:57.087 | INFO     | api.controllers.websocket_controller:send_sync_state:544 - 📜 发送历史消息 4 条给 test-123
+2026-02-17 17:07:57.087 | INFO     | api.controllers.websocket_controller:send_sync_state:544 - 📜 发送历史消息 4 条给 test-123
+2026-02-17 17:07:59.884 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-123: start
+2026-02-17 17:07:59.884 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-123: start
+2026-02-17 17:08:01.682 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-123: start
+2026-02-17 17:08:01.682 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-123: start
+2026-02-17 17:08:24.723 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-123
+2026-02-17 17:08:24.723 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-123
+2026-02-17 17:08:24.724 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-123
+2026-02-17 17:08:24.724 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-123
+2026-02-17 17:08:24.824 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 17:08:24.824 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 17:08:24.825 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 17:08:24.825 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 17:08:26.691 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 17:08:26.691 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 17:08:26.693 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 17:08:26.693 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 17:08:26.694 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 17:08:26.694 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 17:08:26.694 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 17:08:26.694 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 17:08:28.006 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 17:08:28.006 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 17:08:28.007 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 17:08:28.007 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 17:08:29.430 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 17:08:29.430 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 17:08:29.434 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 17:08:29.434 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 17:08:29.435 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 17:08:29.435 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 17:08:29.435 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 17:08:29.435 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 17:08:30.041 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 17:08:30.041 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 17:08:30.041 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 17:08:30.041 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 17:08:35.266 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 17:08:35.266 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 17:08:35.270 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 17:08:35.270 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 17:08:35.270 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 17:08:35.270 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 17:08:35.270 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 17:08:35.270 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 17:08:36.310 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-123 来自 127.0.0.1
+2026-02-17 17:08:36.310 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-123 来自 127.0.0.1
+2026-02-17 17:08:36.313 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-123
+2026-02-17 17:08:36.313 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-123
+2026-02-17 17:08:36.314 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-123
+2026-02-17 17:08:36.314 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-123
+2026-02-17 17:08:36.315 | INFO     | api.controllers.websocket_controller:send_sync_state:544 - 📜 发送历史消息 4 条给 test-123
+2026-02-17 17:08:36.315 | INFO     | api.controllers.websocket_controller:send_sync_state:544 - 📜 发送历史消息 4 条给 test-123
+2026-02-17 17:08:40.169 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-123: start
+2026-02-17 17:08:40.169 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-123: start
+2026-02-17 17:08:41.681 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-123: start
+2026-02-17 17:08:41.681 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-123: start
+2026-02-17 17:09:09.757 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-123
+2026-02-17 17:09:09.757 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-123
+2026-02-17 17:09:09.757 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-123
+2026-02-17 17:09:09.757 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-123
+2026-02-17 17:09:09.857 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 17:09:09.857 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 17:09:09.857 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 17:09:09.857 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 17:09:11.307 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 17:09:11.307 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 17:09:11.310 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 17:09:11.310 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 17:09:11.310 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 17:09:11.310 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 17:09:11.311 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 17:09:11.311 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 17:09:11.829 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 17:09:11.829 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 17:09:11.830 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 17:09:11.830 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 17:09:16.962 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 17:09:16.962 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 17:09:16.964 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 17:09:16.964 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 17:09:16.964 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 17:09:16.964 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 17:09:16.965 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 17:09:16.965 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 17:09:23.409 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-124 来自 127.0.0.1
+2026-02-17 17:09:23.409 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-124 来自 127.0.0.1
+2026-02-17 17:09:23.413 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-124
+2026-02-17 17:09:23.413 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-124
+2026-02-17 17:09:23.414 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-124
+2026-02-17 17:09:23.414 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-124
+2026-02-17 17:09:28.206 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-124: start
+2026-02-17 17:09:28.206 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-124: start
+2026-02-17 17:09:35.256 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-124: start
+2026-02-17 17:09:35.256 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-124: start
+2026-02-17 17:12:12.460 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-124
+2026-02-17 17:12:12.460 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-124
+2026-02-17 17:12:12.461 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-124
+2026-02-17 17:12:12.461 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-124
+2026-02-17 17:12:12.561 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 17:12:12.561 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 17:12:12.562 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 17:12:12.562 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 17:12:14.417 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 17:12:14.417 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 17:12:14.420 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 17:12:14.420 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 17:12:14.421 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 17:12:14.421 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 17:12:14.421 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 17:12:14.421 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 17:12:57.943 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 17:12:57.943 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 17:12:57.944 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 17:12:57.944 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 17:12:59.341 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 17:12:59.341 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 17:12:59.343 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 17:12:59.343 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 17:12:59.344 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 17:12:59.344 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 17:12:59.344 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 17:12:59.344 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 17:12:59.547 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 17:12:59.547 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 17:12:59.547 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 17:12:59.547 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 17:13:04.490 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 17:13:04.490 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 17:13:04.493 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 17:13:04.493 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 17:13:04.494 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 17:13:04.494 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 17:13:04.494 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 17:13:04.494 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 17:13:14.525 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-125 来自 127.0.0.1
+2026-02-17 17:13:14.525 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-125 来自 127.0.0.1
+2026-02-17 17:13:14.527 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-125
+2026-02-17 17:13:14.527 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-125
+2026-02-17 17:13:14.528 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-125
+2026-02-17 17:13:14.528 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-125
+2026-02-17 17:13:22.861 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-125: start
+2026-02-17 17:13:22.861 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-125: start
+2026-02-17 17:14:15.957 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-125
+2026-02-17 17:14:15.957 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-125
+2026-02-17 17:14:15.957 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-125
+2026-02-17 17:14:15.957 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-125
+2026-02-17 17:14:16.058 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 17:14:16.058 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 17:14:16.059 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 17:14:16.059 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 17:14:18.002 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 17:14:18.002 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 17:14:18.005 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 17:14:18.005 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 17:14:18.005 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 17:14:18.005 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 17:14:18.006 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 17:14:18.006 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 17:14:27.700 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 17:14:27.700 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 17:14:27.700 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 17:14:27.700 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 17:14:29.079 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 17:14:29.079 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 17:14:29.082 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 17:14:29.082 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 17:14:29.083 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 17:14:29.083 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 17:14:29.083 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 17:14:29.083 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 17:14:29.592 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 17:14:29.592 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 17:14:29.593 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 17:14:29.593 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 17:14:36.350 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 17:14:36.350 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 17:14:36.353 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 17:14:36.353 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 17:14:36.353 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 17:14:36.353 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 17:14:36.354 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 17:14:36.354 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 17:14:39.735 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-126 来自 127.0.0.1
+2026-02-17 17:14:39.735 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-126 来自 127.0.0.1
+2026-02-17 17:14:39.738 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-126
+2026-02-17 17:14:39.738 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-126
+2026-02-17 17:14:39.738 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-126
+2026-02-17 17:14:39.738 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-126
+2026-02-17 17:14:48.858 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-126: start
+2026-02-17 17:14:48.858 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-126: start
+2026-02-17 17:14:51.866 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-126: start
+2026-02-17 17:14:51.866 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-126: start
+2026-02-17 17:17:23.363 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-126
+2026-02-17 17:17:23.363 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-126
+2026-02-17 17:17:23.363 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-126
+2026-02-17 17:17:23.363 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-126
+2026-02-17 17:17:23.463 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 17:17:23.463 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 17:17:23.464 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 17:17:23.464 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 17:17:28.026 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 17:17:28.026 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 17:17:28.029 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 17:17:28.029 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 17:17:28.030 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 17:17:28.030 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 17:17:28.030 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 17:17:28.030 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 17:17:44.802 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 17:17:44.802 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 17:17:44.803 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 17:17:44.803 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 17:17:46.396 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 17:17:46.396 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 17:17:46.399 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 17:17:46.399 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 17:17:46.399 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 17:17:46.399 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 17:17:46.399 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 17:17:46.399 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 17:17:55.566 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 17:17:55.566 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 17:17:55.567 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 17:17:55.567 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 17:17:57.035 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 17:17:57.035 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 17:17:57.038 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 17:17:57.038 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 17:17:57.038 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 17:17:57.038 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 17:17:57.038 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 17:17:57.038 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 17:18:02.377 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 17:18:02.377 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 17:18:02.377 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 17:18:02.377 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 17:18:09.151 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 17:18:09.151 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 17:18:09.155 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 17:18:09.155 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 17:18:09.155 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 17:18:09.155 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 17:18:09.156 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 17:18:09.156 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 17:18:24.322 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-126 来自 127.0.0.1
+2026-02-17 17:18:24.322 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-126 来自 127.0.0.1
+2026-02-17 17:18:24.323 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-126
+2026-02-17 17:18:24.323 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-126
+2026-02-17 17:18:24.324 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-126
+2026-02-17 17:18:24.324 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-126
+2026-02-17 17:18:27.740 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-126: start
+2026-02-17 17:18:27.740 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-126: start
+2026-02-17 17:21:33.419 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-126: message
+2026-02-17 17:21:33.419 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-126: message
+2026-02-17 17:25:33.862 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-126
+2026-02-17 17:25:33.862 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-126
+2026-02-17 17:25:33.862 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-126
+2026-02-17 17:25:33.862 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-126
+2026-02-17 17:25:39.908 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-123 来自 127.0.0.1
+2026-02-17 17:25:39.908 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-123 来自 127.0.0.1
+2026-02-17 17:25:39.910 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-123
+2026-02-17 17:25:39.910 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-123
+2026-02-17 17:25:39.910 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-123
+2026-02-17 17:25:39.910 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-123
+2026-02-17 17:25:39.912 | INFO     | api.controllers.websocket_controller:send_sync_state:545 - 📜 发送历史消息 4 条给 test-123
+2026-02-17 17:25:39.912 | INFO     | api.controllers.websocket_controller:send_sync_state:545 - 📜 发送历史消息 4 条给 test-123
+2026-02-17 17:25:40.426 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-123: start
+2026-02-17 17:25:40.426 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-123: start
+2026-02-17 17:25:50.454 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-123
+2026-02-17 17:25:50.454 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-123
+2026-02-17 17:25:50.455 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-123
+2026-02-17 17:25:50.455 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-123
+2026-02-17 17:26:08.121 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-123 来自 127.0.0.1
+2026-02-17 17:26:08.121 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-123 来自 127.0.0.1
+2026-02-17 17:26:08.122 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-123
+2026-02-17 17:26:08.122 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-123
+2026-02-17 17:26:08.122 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-123
+2026-02-17 17:26:08.122 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-123
+2026-02-17 17:26:08.123 | INFO     | api.controllers.websocket_controller:send_sync_state:545 - 📜 发送历史消息 4 条给 test-123
+2026-02-17 17:26:08.123 | INFO     | api.controllers.websocket_controller:send_sync_state:545 - 📜 发送历史消息 4 条给 test-123
+2026-02-17 17:26:08.627 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-123: start
+2026-02-17 17:26:08.627 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-123: start
+2026-02-17 17:26:22.971 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-123: message
+2026-02-17 17:26:22.971 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-123: message
+2026-02-17 17:26:51.699 | ERROR    | api.controllers.websocket_controller:handle_message:304 - ❌ 处理消息失败: 
+2026-02-17 17:26:51.699 | ERROR    | api.controllers.websocket_controller:handle_message:304 - ❌ 处理消息失败: 
+2026-02-17 17:26:51.700 | ERROR    | api.controllers.websocket_controller:websocket_endpoint:91 - ❌ WebSocket错误 test-123: Cannot call "send" once a close message has been sent.
+2026-02-17 17:26:51.700 | ERROR    | api.controllers.websocket_controller:websocket_endpoint:91 - ❌ WebSocket错误 test-123: Cannot call "send" once a close message has been sent.
+2026-02-17 17:26:51.700 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-123
+2026-02-17 17:26:51.700 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-123
+2026-02-17 17:26:51.773 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 17:26:51.773 | INFO     | main:lifespan:48 - 👋 应用关闭中...
+2026-02-17 17:26:51.774 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 17:26:51.774 | INFO     | main:lifespan:50 - ✅ 数据库连接已关闭
+2026-02-17 17:27:01.500 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 17:27:01.500 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-17 17:27:01.503 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 17:27:01.503 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-17 17:27:01.504 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 17:27:01.504 | INFO     | main:lifespan:40 - 🤖 Agent 初始化完成
+2026-02-17 17:27:01.504 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 17:27:01.504 | INFO     | api.controllers.websocket_controller:set_agent:36 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-17 17:27:06.625 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-126 来自 127.0.0.1
+2026-02-17 17:27:06.625 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-126 来自 127.0.0.1
+2026-02-17 17:27:06.627 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-126
+2026-02-17 17:27:06.627 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-126
+2026-02-17 17:27:06.627 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-126
+2026-02-17 17:27:06.627 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-126
+2026-02-17 17:27:06.628 | INFO     | api.controllers.websocket_controller:send_sync_state:545 - 📜 发送历史消息 2 条给 test-126
+2026-02-17 17:27:06.628 | INFO     | api.controllers.websocket_controller:send_sync_state:545 - 📜 发送历史消息 2 条给 test-126
+2026-02-17 17:27:07.131 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-126: start
+2026-02-17 17:27:07.131 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-126: start
+2026-02-17 17:27:25.457 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-126
+2026-02-17 17:27:25.457 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-126
+2026-02-17 17:27:25.457 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-126
+2026-02-17 17:27:25.457 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-126
+2026-02-17 17:27:27.340 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-127 来自 127.0.0.1
+2026-02-17 17:27:27.340 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-127 来自 127.0.0.1
+2026-02-17 17:27:27.342 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-127
+2026-02-17 17:27:27.342 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-127
+2026-02-17 17:27:27.343 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-127
+2026-02-17 17:27:27.343 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-127
+2026-02-17 17:27:27.847 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-127: start
+2026-02-17 17:27:27.847 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-127: start
+2026-02-17 17:27:42.382 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-127
+2026-02-17 17:27:42.382 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-127
+2026-02-17 17:27:42.382 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-127
+2026-02-17 17:27:42.382 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-127
+2026-02-17 17:27:47.959 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-127 来自 127.0.0.1
+2026-02-17 17:27:47.959 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-127 来自 127.0.0.1
+2026-02-17 17:27:47.960 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-127
+2026-02-17 17:27:47.960 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-127
+2026-02-17 17:27:47.961 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-127
+2026-02-17 17:27:47.961 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-127
+2026-02-17 17:27:48.465 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-127: start
+2026-02-17 17:27:48.465 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-127: start
+2026-02-17 17:27:55.116 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-127: edit_section
+2026-02-17 17:27:55.116 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-127: edit_section
+2026-02-17 17:28:11.801 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-127
+2026-02-17 17:28:11.801 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-127
+2026-02-17 17:28:11.801 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-127
+2026-02-17 17:28:11.801 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-127
+2026-02-17 17:28:20.183 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-123 来自 127.0.0.1
+2026-02-17 17:28:20.183 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-123 来自 127.0.0.1
+2026-02-17 17:28:20.184 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-123
+2026-02-17 17:28:20.184 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-123
+2026-02-17 17:28:20.184 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-123
+2026-02-17 17:28:20.184 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-123
+2026-02-17 17:28:20.186 | INFO     | api.controllers.websocket_controller:send_sync_state:545 - 📜 发送历史消息 5 条给 test-123
+2026-02-17 17:28:20.186 | INFO     | api.controllers.websocket_controller:send_sync_state:545 - 📜 发送历史消息 5 条给 test-123
+2026-02-17 17:28:20.689 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-123: start
+2026-02-17 17:28:20.689 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-123: start
+2026-02-17 17:28:22.334 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-123: message
+2026-02-17 17:28:22.334 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-123: message
+2026-02-17 17:30:10.127 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-123
+2026-02-17 17:30:10.127 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-123
+2026-02-17 17:30:10.128 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-123
+2026-02-17 17:30:10.128 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-123
+2026-02-17 17:30:15.006 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-123 来自 127.0.0.1
+2026-02-17 17:30:15.006 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-123 来自 127.0.0.1
+2026-02-17 17:30:15.008 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-123
+2026-02-17 17:30:15.008 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-123
+2026-02-17 17:30:15.008 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-123
+2026-02-17 17:30:15.008 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-123
+2026-02-17 17:30:15.009 | INFO     | api.controllers.websocket_controller:send_sync_state:545 - 📜 发送历史消息 7 条给 test-123
+2026-02-17 17:30:15.009 | INFO     | api.controllers.websocket_controller:send_sync_state:545 - 📜 发送历史消息 7 条给 test-123
+2026-02-17 17:30:15.512 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-123: start
+2026-02-17 17:30:15.512 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-123: start
+2026-02-17 17:30:27.476 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-123: message
+2026-02-17 17:30:27.476 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-123: message
+2026-02-17 17:30:43.184 | ERROR    | api.controllers.websocket_controller:handle_message:304 - ❌ 处理消息失败: 
+2026-02-17 17:30:43.184 | ERROR    | api.controllers.websocket_controller:handle_message:304 - ❌ 处理消息失败: 
+2026-02-17 17:30:43.185 | ERROR    | api.controllers.websocket_controller:websocket_endpoint:91 - ❌ WebSocket错误 test-123: Cannot call "send" once a close message has been sent.
+2026-02-17 17:30:43.185 | ERROR    | api.controllers.websocket_controller:websocket_endpoint:91 - ❌ WebSocket错误 test-123: Cannot call "send" once a close message has been sent.
+2026-02-17 17:30:43.185 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-123
+2026-02-17 17:30:43.185 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-123
+2026-02-17 17:30:46.661 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-123 来自 127.0.0.1
+2026-02-17 17:30:46.661 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-123 来自 127.0.0.1
+2026-02-17 17:30:46.663 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-123
+2026-02-17 17:30:46.663 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-123
+2026-02-17 17:30:46.663 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-123
+2026-02-17 17:30:46.663 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-123
+2026-02-17 17:30:46.664 | INFO     | api.controllers.websocket_controller:send_sync_state:545 - 📜 发送历史消息 8 条给 test-123
+2026-02-17 17:30:46.664 | INFO     | api.controllers.websocket_controller:send_sync_state:545 - 📜 发送历史消息 8 条给 test-123
+2026-02-17 17:30:47.167 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-123: start
+2026-02-17 17:30:47.167 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-123: start
+2026-02-17 17:30:55.158 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-123: message
+2026-02-17 17:30:55.158 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-123: message
+2026-02-17 17:34:43.382 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-123
+2026-02-17 17:34:43.382 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-123
+2026-02-17 17:34:43.383 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-123
+2026-02-17 17:34:43.383 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-123
+2026-02-17 17:34:48.755 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-123 来自 127.0.0.1
+2026-02-17 17:34:48.755 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-123 来自 127.0.0.1
+2026-02-17 17:34:48.756 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-123
+2026-02-17 17:34:48.756 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-123
+2026-02-17 17:34:48.756 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-123
+2026-02-17 17:34:48.756 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-123
+2026-02-17 17:34:48.758 | INFO     | api.controllers.websocket_controller:send_sync_state:545 - 📜 发送历史消息 10 条给 test-123
+2026-02-17 17:34:48.758 | INFO     | api.controllers.websocket_controller:send_sync_state:545 - 📜 发送历史消息 10 条给 test-123
+2026-02-17 17:34:48.760 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-123: start
+2026-02-17 17:34:48.760 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-123: start
+2026-02-17 17:34:55.210 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-123
+2026-02-17 17:34:55.210 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-123
+2026-02-17 17:34:55.210 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-123
+2026-02-17 17:34:55.210 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-123
+2026-02-17 17:35:07.565 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-128 来自 127.0.0.1
+2026-02-17 17:35:07.565 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-128 来自 127.0.0.1
+2026-02-17 17:35:07.568 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-128
+2026-02-17 17:35:07.568 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-128
+2026-02-17 17:35:07.568 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-128
+2026-02-17 17:35:07.568 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-128
+2026-02-17 17:35:07.571 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-128: start
+2026-02-17 17:35:07.571 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-128: start
+2026-02-17 17:35:33.576 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-128: edit_section
+2026-02-17 17:35:33.576 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-128: edit_section
+2026-02-17 17:35:33.577 | ERROR    | api.controllers.websocket_controller:handle_edit_section:414 - ❌ 修改失败: 'section_id'
+2026-02-17 17:35:33.577 | ERROR    | api.controllers.websocket_controller:handle_edit_section:414 - ❌ 修改失败: 'section_id'
+2026-02-17 17:35:33.603 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-128
+2026-02-17 17:35:33.603 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-128
+2026-02-17 17:35:33.604 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-128
+2026-02-17 17:35:33.604 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-128
+2026-02-17 17:35:40.309 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-129 来自 127.0.0.1
+2026-02-17 17:35:40.309 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-129 来自 127.0.0.1
+2026-02-17 17:35:40.312 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-129
+2026-02-17 17:35:40.312 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-129
+2026-02-17 17:35:40.312 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-129
+2026-02-17 17:35:40.312 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-129
+2026-02-17 17:35:40.315 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-129: start
+2026-02-17 17:35:40.315 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-129: start
+2026-02-17 17:35:54.271 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-129: edit_section
+2026-02-17 17:35:54.271 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-129: edit_section
+2026-02-17 17:35:54.272 | ERROR    | api.controllers.websocket_controller:handle_edit_section:414 - ❌ 修改失败: 'section_id'
+2026-02-17 17:35:54.272 | ERROR    | api.controllers.websocket_controller:handle_edit_section:414 - ❌ 修改失败: 'section_id'
+2026-02-17 17:39:48.230 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-129
+2026-02-17 17:39:48.230 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-129
+2026-02-17 17:39:48.231 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-129
+2026-02-17 17:39:48.231 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-129
+2026-02-17 17:39:51.219 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-123 来自 127.0.0.1
+2026-02-17 17:39:51.219 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-123 来自 127.0.0.1
+2026-02-17 17:39:51.221 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-123
+2026-02-17 17:39:51.221 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-123
+2026-02-17 17:39:51.221 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-123
+2026-02-17 17:39:51.221 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-123
+2026-02-17 17:39:51.223 | INFO     | api.controllers.websocket_controller:send_sync_state:545 - 📜 发送历史消息 10 条给 test-123
+2026-02-17 17:39:51.223 | INFO     | api.controllers.websocket_controller:send_sync_state:545 - 📜 发送历史消息 10 条给 test-123
+2026-02-17 17:40:21.825 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-123
+2026-02-17 17:40:21.825 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-123
+2026-02-17 17:40:21.825 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-123
+2026-02-17 17:40:21.825 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-123
+2026-02-17 17:40:27.698 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-131 来自 127.0.0.1
+2026-02-17 17:40:27.698 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-131 来自 127.0.0.1
+2026-02-17 17:40:27.701 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-131
+2026-02-17 17:40:27.701 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-131
+2026-02-17 17:40:27.701 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-131
+2026-02-17 17:40:27.701 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-131
+2026-02-17 17:40:39.505 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-131: start
+2026-02-17 17:40:39.505 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-131: start
+2026-02-17 17:42:55.509 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-131
+2026-02-17 17:42:55.509 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-131
+2026-02-17 17:42:55.511 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-131
+2026-02-17 17:42:55.511 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-131
+2026-02-17 17:42:59.763 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-133 来自 127.0.0.1
+2026-02-17 17:42:59.763 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-133 来自 127.0.0.1
+2026-02-17 17:42:59.766 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-133
+2026-02-17 17:42:59.766 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-133
+2026-02-17 17:42:59.766 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-133
+2026-02-17 17:42:59.766 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-133
+2026-02-17 17:43:06.903 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-133: start
+2026-02-17 17:43:06.903 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-133: start
+2026-02-17 17:43:31.955 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-133
+2026-02-17 17:43:31.955 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-133
+2026-02-17 17:43:31.956 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-133
+2026-02-17 17:43:31.956 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-133
+2026-02-17 17:43:36.124 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-134 来自 127.0.0.1
+2026-02-17 17:43:36.124 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 📨 WebSocket连接请求: test-134 来自 127.0.0.1
+2026-02-17 17:43:36.126 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-134
+2026-02-17 17:43:36.126 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:53 - 📁 创建/加载对话实例: test-134
+2026-02-17 17:43:36.126 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-134
+2026-02-17 17:43:36.126 | INFO     | api.controllers.websocket_controller:websocket_endpoint:76 - ✅ WebSocket连接成功: test-134
+2026-02-17 17:43:41.353 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-134: start
+2026-02-17 17:43:41.353 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-134: start
+2026-02-17 17:44:19.034 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-134: message
+2026-02-17 17:44:19.034 | DEBUG    | api.controllers.websocket_controller:websocket_endpoint:83 - 📥 收到消息 test-134: message
+2026-02-17 17:44:36.708 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-134
+2026-02-17 17:44:36.708 | INFO     | api.controllers.websocket_controller:websocket_endpoint:88 - 🔌 WebSocket断开连接: test-134
+2026-02-17 17:44:36.709 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-134
+2026-02-17 17:44:36.709 | INFO     | api.controllers.websocket_controller:remove_conversation:63 - 📁 对话实例已移除: test-134

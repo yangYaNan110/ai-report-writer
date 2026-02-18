@@ -4,526 +4,525 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI报告写作系统 - WebSocket测试（新版）</title>
+    <title>AI报告写作助手</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-
-        h1 {
-            color: #333;
-            border-bottom: 2px solid #4CAF50;
-            padding-bottom: 10px;
-        }
-
-        .subtitle {
-            color: #666;
-            margin-top: -5px;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
-
-        .container {
-            display: flex;
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .left-panel {
-            flex: 1;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .right-panel {
-            flex: 2;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #555;
-        }
-
-        input,
-        textarea,
-        select {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
+        * {
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
         }
 
-        textarea {
-            height: 80px;
-            resize: vertical;
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #1e1e2f;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            margin-right: 10px;
-            margin-bottom: 10px;
+        .app-container {
+            width: 100%;
+            max-width: 1200px;
+            height: 90vh;
+            background-color: #2d2d3f;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            color: #e0e0e0;
         }
 
-        button:hover {
-            background-color: #45a049;
+        /* 头部 */
+        .header {
+            padding: 16px 24px;
+            background-color: #36364b;
+            border-bottom: 1px solid #4a4a60;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        button.danger {
-            background-color: #f44336;
+        .header h1 {
+            font-size: 20px;
+            font-weight: 500;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        button.danger:hover {
-            background-color: #da190b;
+        .connection-area {
+            display: flex;
+            gap: 12px;
+            align-items: center;
         }
 
-        button.secondary {
-            background-color: #2196F3;
-        }
-
-        button.secondary:hover {
-            background-color: #0b7dda;
-        }
-
-        button.small {
-            padding: 5px 10px;
-            font-size: 12px;
-        }
-
-        .status {
-            padding: 10px;
-            border-radius: 4px;
-            margin-bottom: 15px;
-            font-weight: bold;
-        }
-
-        .connected {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .disconnected {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .messages {
-            height: 450px;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            padding: 10px;
-            border-radius: 4px;
-            background-color: #fafafa;
-            font-family: 'Consolas', monospace;
-            font-size: 13px;
-        }
-
-        .message {
-            margin-bottom: 12px;
-            padding: 10px;
+        .thread-input {
+            background-color: #2d2d3f;
+            border: 1px solid #4a4a60;
+            color: #fff;
+            padding: 8px 12px;
             border-radius: 6px;
-            border-left: 4px solid transparent;
+            width: 200px;
+        }
+
+        .thread-input:focus {
+            outline: none;
+            border-color: #6c5ce7;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background-color: #6c5ce7;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #5b4bc4;
+        }
+
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            background-color: #2d2d3f;
+            border: 1px solid #4a4a60;
+        }
+
+        .status-connected {
+            color: #2ecc71;
+        }
+
+        .status-disconnected {
+            color: #e74c3c;
+        }
+
+        /* 主内容区 */
+        .main-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* 左侧 - 对话历史 */
+        .chat-history {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #4a4a60;
+            background-color: #2d2d3f;
+        }
+
+        .history-header {
+            padding: 16px;
+            border-bottom: 1px solid #4a4a60;
+            font-weight: 500;
+            color: #a0a0c0;
+        }
+
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* 右侧 - 报告预览 */
+        .report-preview {
+            width: 40%;
+            background-color: #252536;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .preview-header {
+            padding: 16px;
+            border-bottom: 1px solid #4a4a60;
+            font-weight: 500;
+            color: #a0a0c0;
+        }
+
+        .preview-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        /* 消息样式 */
+        .message {
+            max-width: 85%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            position: relative;
+            word-wrap: break-word;
+            line-height: 1.5;
         }
 
         .user-message {
-            background-color: #e3f2fd;
-            border-left-color: #2196F3;
+            background-color: #6c5ce7;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
         }
 
         .assistant-message {
-            background-color: #f1f8e9;
-            border-left-color: #4CAF50;
+            background-color: #36364b;
+            color: #e0e0e0;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+            border: 1px solid #4a4a60;
         }
 
         .system-message {
-            background-color: #fff3e0;
-            border-left-color: #FF9800;
-        }
-
-        .error-message {
-            background-color: #ffebee;
-            border-left-color: #f44336;
-        }
-
-        .message-header {
-            font-weight: bold;
-            margin-bottom: 5px;
-            font-size: 12px;
-            color: #666;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .message-content {
-            word-wrap: break-word;
-            white-space: pre-wrap;
-        }
-
-        .event-type {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 10px;
-            font-weight: bold;
-            background-color: #e0e0e0;
-        }
-
-        .event-type-sync {
-            background-color: #e1f5fe;
-            color: #01579b;
-        }
-
-        .event-type-chunk {
-            background-color: #e8f5e8;
-            color: #1b5e20;
-        }
-
-        .event-type-prompt {
-            background-color: #fff9c4;
-            color: #f57f17;
-        }
-
-        .event-type-section_ready {
-            background-color: #d1c4e9;
-            color: #311b92;
-        }
-
-        .event-type-section_updated {
-            background-color: #b2ebf2;
-            color: #006064;
-        }
-
-        .event-type-report_completed {
-            background-color: #c8e6c9;
-            color: #1b5e20;
-        }
-
-        .event-type-error {
-            background-color: #ffcdd2;
-            color: #b71c1c;
-        }
-
-        .stats {
-            display: flex;
-            gap: 20px;
-            margin-top: 15px;
-            padding: 10px;
-            background-color: #e9ecef;
-            border-radius: 4px;
-            flex-wrap: wrap;
-        }
-
-        .stat-item {
+            background-color: #2d2d3f;
+            color: #a0a0c0;
+            align-self: center;
             font-size: 13px;
+            border: 1px dashed #4a4a60;
         }
 
-        .stat-label {
-            font-weight: bold;
-            color: #495057;
+        .message-time {
+            font-size: 11px;
+            color: #888;
+            margin-top: 4px;
         }
 
-        .action-buttons {
-            margin-top: 20px;
+        .user-time {
+            text-align: right;
+        }
+
+        /* 大纲卡片 */
+        .outline-card {
+            background-color: #2d2d3f;
+            border: 1px solid #6c5ce7;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 8px 0;
+        }
+
+        .outline-title {
+            color: #6c5ce7;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .outline-item {
+            padding: 8px 12px;
+            margin: 4px 0;
+            background-color: #36364b;
+            border-radius: 4px;
+            border-left: 3px solid #6c5ce7;
+        }
+
+        /* 确认框 */
+        .confirmation-box {
+            background-color: #36364b;
+            border: 1px solid #6c5ce7;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 16px 0;
+            align-self: center;
+            width: 100%;
+        }
+
+        .confirmation-question {
+            color: #fff;
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+
+        .confirmation-options {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
         }
 
-        .quick-test {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px dashed #ddd;
+        .option-btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
         }
 
-        .request-id {
-            color: #999;
-            font-size: 10px;
+        .option-confirm {
+            background-color: #2ecc71;
+            color: white;
         }
 
-        .timestamp {
-            color: #999;
-            font-size: 10px;
+        .option-edit {
+            background-color: #f39c12;
+            color: white;
+        }
+
+        .option-regenerate {
+            background-color: #9b59b6;
+            color: white;
+        }
+
+        .option-btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+
+        /* 流式输出 */
+        .streaming-message {
+            border-left: 3px solid #6c5ce7;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 2px;
+            height: 18px;
+            background-color: #6c5ce7;
+            margin-left: 2px;
+            animation: blink 1s infinite;
+            vertical-align: middle;
+        }
+
+        @keyframes blink {
+
+            0%,
+            50% {
+                opacity: 1;
+            }
+
+            51%,
+            100% {
+                opacity: 0;
+            }
+        }
+
+        /* 输入区 */
+        .input-area {
+            padding: 16px;
+            background-color: #36364b;
+            border-top: 1px solid #4a4a60;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        textarea {
+            flex: 1;
+            background-color: #2d2d3f;
+            border: 1px solid #4a4a60;
+            color: #fff;
+            padding: 12px;
+            border-radius: 8px;
+            resize: none;
+            font-family: inherit;
+            font-size: 14px;
+            max-height: 100px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #6c5ce7;
+        }
+
+        textarea::placeholder {
+            color: #666;
+        }
+
+        .send-btn {
+            padding: 12px 24px;
+            background-color: #6c5ce7;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .send-btn:hover {
+            background-color: #5b4bc4;
+        }
+
+        .send-btn:disabled {
+            background-color: #4a4a60;
+            cursor: not-allowed;
+        }
+
+        /* 欢迎界面 */
+        .welcome-screen {
+            text-align: center;
+            padding: 40px 20px;
+            color: #a0a0c0;
+        }
+
+        .welcome-title {
+            font-size: 28px;
+            color: #fff;
+            margin-bottom: 16px;
+        }
+
+        .examples {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        .example-item {
+            background-color: #36364b;
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            border: 1px solid #4a4a60;
+            transition: all 0.2s;
+        }
+
+        .example-item:hover {
+            border-color: #6c5ce7;
+            background-color: #40405a;
+        }
+
+        /* 报告内容 */
+        .report-section {
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            color: #6c5ce7;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .section-content {
+            color: #e0e0e0;
+            line-height: 1.6;
         }
     </style>
 </head>
 
 <body>
-    <h1>🤖 AI报告写作系统 - WebSocket测试（新版）</h1>
-    <div class="subtitle">使用纯数据模型 | 事件类型: start/message/approve/edit_section/regenerate</div>
-
-    <div class="container">
-        <div class="left-panel">
-            <h2>🔌 连接设置</h2>
-            <div class="form-group">
-                <label for="threadId">对话ID (thread_id):</label>
-                <input type="text" id="threadId" value="test-123" placeholder="输入对话ID">
-                <div style="margin-top: 5px; font-size: 12px; color: #666;">每个ID对应一个独立的对话实例</div>
-            </div>
-
-            <div class="form-group">
-                <label>连接状态:</label>
-                <div id="connectionStatus" class="status disconnected">未连接</div>
-            </div>
-
-            <button id="connectBtn" class="secondary">🔌 连接</button>
-            <button id="disconnectBtn" class="danger" disabled>❌ 断开</button>
-
-            <div class="stats" id="connectionStats">
-                <div class="stat-item"><span class="stat-label">活跃对话:</span> <span id="activeConnections">-</span></div>
-                <div class="stat-item"><span class="stat-label">Agent状态:</span> <span id="agentStatus">-</span></div>
-            </div>
-
-            <h2 style="margin-top: 30px;">📤 发送消息</h2>
-            <div class="form-group">
-                <label for="messageType">消息类型:</label>
-                <select id="messageType">
-                    <option value="ping">PING (心跳测试)</option>
-                    <option value="start" selected>START (开始新对话)</option>
-                    <option value="message">MESSAGE (发送消息)</option>
-                    <option value="approve">APPROVE (确认大纲/段落)</option>
-                    <option value="edit_section">EDIT_SECTION (修改段落)</option>
-                    <option value="regenerate">REGENERATE (重写段落)</option>
-                    <option value="cancel">CANCEL (取消操作)</option>
-                </select>
-            </div>
-
-            <!-- START 字段 -->
-            <div id="startFields" style="display: none;">
-                <div class="form-group">
-                    <label for="startTitle">对话标题:</label>
-                    <input type="text" id="startTitle" value="AI医疗报告" placeholder="输入报告标题">
-                </div>
-            </div>
-
-            <!-- MESSAGE 字段 -->
-            <div id="messageFields" style="display: block;">
-                <div class="form-group">
-                    <label for="messageContent">消息内容:</label>
-                    <textarea id="messageContent" placeholder="输入消息内容...">帮我写一份关于人工智能在医疗领域应用的报告</textarea>
-                </div>
-                <div class="form-group">
-                    <label for="replyTo">回复目标 (可选):</label>
-                    <input type="text" id="replyTo" placeholder="消息ID">
-                </div>
-            </div>
-
-            <!-- APPROVE/EDIT/REGENERATE 字段（动态显示） -->
-            <div id="sectionFields" style="display: none;">
-                <div class="form-group">
-                    <label for="sectionId">段落ID:</label>
-                    <input type="text" id="sectionId" placeholder="如: sec-1">
-                </div>
-                <div class="form-group" id="instructionField" style="display: none;">
-                    <label for="instruction">修改意见:</label>
-                    <textarea id="instruction" placeholder="输入修改意见..."></textarea>
-                </div>
-                <div class="form-group" id="feedbackField" style="display: none;">
-                    <label for="feedback">反馈意见 (可选):</label>
-                    <input type="text" id="feedback" placeholder="反馈意见">
-                </div>
-            </div>
-
-            <div class="action-buttons">
-                <button id="sendBtn" disabled>📤 发送</button>
-                <button id="clearMessagesBtn" class="secondary">🗑️ 清空消息</button>
-            </div>
-
-            <div class="quick-test">
-                <h3>⚡ 快速测试流程</h3>
-                <button id="testPingBtn" class="small" disabled>1. 测试Ping</button>
-                <button id="testStartBtn" class="small" disabled>2. 开始新对话</button>
-                <button id="testApprovePlanBtn" class="small" disabled>3. 确认大纲</button>
-                <button id="testMessageBtn" class="small" disabled>4. 发送消息</button>
-                <button id="testApproveSectionBtn" class="small" disabled>5. 确认段落</button>
-                <div style="margin-top: 10px; font-size: 12px; color: #666;">
-                    提示：按顺序点击测试完整流程
-                </div>
+    <div class="app-container">
+        <!-- 头部 -->
+        <div class="header">
+            <h1>
+                <span>📝 AI报告写作助手</span>
+            </h1>
+            <div class="connection-area">
+                <input type="text" id="threadId" class="thread-input" placeholder="对话ID" value="test-123">
+                <button id="connectBtn" class="btn btn-primary">连接</button>
+                <button id="disconnectBtn" class="btn btn-danger" disabled>断开</button>
+                <span id="connectionStatus" class="status-badge status-disconnected">未连接</span>
             </div>
         </div>
 
-        <div class="right-panel">
-            <h2>📋 消息日志</h2>
-            <div id="messages" class="messages">
-                <!-- 消息会动态添加到这里 -->
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <!-- 左侧对话历史 -->
+            <div class="chat-history">
+                <div class="history-header">
+                    💬 对话历史
+                </div>
+                <div id="messagesContainer" class="messages-container">
+                    <!-- 欢迎界面 -->
+                    <div id="welcomeScreen" class="welcome-screen">
+                        <div class="welcome-title">👋 你好！我是你的AI报告写作助手</div>
+                        <p>我可以帮你撰写各种类型的报告：技术报告、市场分析、学术综述等</p>
+                        <p>点击下面的示例开始，或直接输入你的需求</p>
+                        <div class="examples">
+                            <div class="example-item" onclick="setExamplePrompt('帮我写一份关于AI医疗的报告')">🏥 AI医疗报告</div>
+                            <div class="example-item" onclick="setExamplePrompt('分析2024年新能源汽车市场趋势')">🚗 新能源车市场分析</div>
+                            <div class="example-item" onclick="setExamplePrompt('写一份数字化转型的技术报告')">💻 数字化转型报告</div>
+                            <div class="example-item" onclick="setExamplePrompt('帮我规划一篇关于量子计算的综述')">⚛️ 量子计算综述</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 输入区 -->
+                <div class="input-area">
+                    <div class="input-container">
+                        <textarea id="messageInput" placeholder="输入你的报告需求... (Shift + Enter 换行，Enter 发送)"
+                            rows="3"></textarea>
+                        <button id="sendBtn" class="send-btn" disabled>发送</button>
+                    </div>
+                </div>
             </div>
 
-            <div class="stats">
-                <div class="stat-item"><span class="stat-label">总消息:</span> <span id="totalMessages">0</span></div>
-                <div class="stat-item"><span class="stat-label">最后活动:</span> <span id="lastActivity">-</span></div>
-                <div class="stat-item"><span class="stat-label">当前阶段:</span> <span id="currentPhase">-</span></div>
-            </div>
-
-            <div style="margin-top: 10px; font-size: 12px; color: #666; text-align: right;">
-                支持的事件类型: sync, chunk, complete, prompt, section_ready, section_updated, state_change, report_completed,
-                task_progress, interrupt, error, pong
+            <!-- 右侧报告预览 -->
+            <div class="report-preview">
+                <div class="preview-header">
+                    📄 报告预览
+                </div>
+                <div id="reportContent" class="preview-content">
+                    <div style="color: #666; text-align: center; margin-top: 50px;">
+                        等待生成报告...
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
         let ws = null;
-        let messageCount = 0;
         let currentThreadId = '';
+        let streamingMessageId = null;
+        let streamingContent = '';
+        let currentOutline = [];
+        let currentPhase = 'idle'; // idle, planning, writing, reviewing
 
         // DOM 元素
         const threadIdInput = document.getElementById('threadId');
         const connectBtn = document.getElementById('connectBtn');
         const disconnectBtn = document.getElementById('disconnectBtn');
         const sendBtn = document.getElementById('sendBtn');
-        const clearMessagesBtn = document.getElementById('clearMessagesBtn');
+        const messageInput = document.getElementById('messageInput');
+        const messagesContainer = document.getElementById('messagesContainer');
+        const reportContent = document.getElementById('reportContent');
         const connectionStatus = document.getElementById('connectionStatus');
-        const messagesDiv = document.getElementById('messages');
-        const totalMessagesSpan = document.getElementById('totalMessages');
-        const lastActivitySpan = document.getElementById('lastActivity');
-        const currentPhaseSpan = document.getElementById('currentPhase');
-        const messageType = document.getElementById('messageType');
-        const startFields = document.getElementById('startFields');
-        const messageFields = document.getElementById('messageFields');
-        const sectionFields = document.getElementById('sectionFields');
-        const instructionField = document.getElementById('instructionField');
-        const feedbackField = document.getElementById('feedbackField');
+        const welcomeScreen = document.getElementById('welcomeScreen');
 
-        // 输入字段
-        const startTitle = document.getElementById('startTitle');
-        const messageContent = document.getElementById('messageContent');
-        const replyTo = document.getElementById('replyTo');
-        const sectionId = document.getElementById('sectionId');
-        const instruction = document.getElementById('instruction');
-        const feedback = document.getElementById('feedback');
-
-        // 测试按钮
-        const testPingBtn = document.getElementById('testPingBtn');
-        const testStartBtn = document.getElementById('testStartBtn');
-        const testApprovePlanBtn = document.getElementById('testApprovePlanBtn');
-        const testMessageBtn = document.getElementById('testMessageBtn');
-        const testApproveSectionBtn = document.getElementById('testApproveSectionBtn');
-
-        // 状态显示
-        const activeConnectionsSpan = document.getElementById('activeConnections');
-        const agentStatusSpan = document.getElementById('agentStatus');
-
-        // 消息类型切换
-        messageType.addEventListener('change', function () {
-            const type = this.value;
-
-            // 隐藏所有动态字段
-            startFields.style.display = 'none';
-            messageFields.style.display = 'none';
-            sectionFields.style.display = 'none';
-            instructionField.style.display = 'none';
-            feedbackField.style.display = 'none';
-
-            // 根据类型显示对应字段
-            if (type === 'start') {
-                startFields.style.display = 'block';
-            } else if (type === 'message') {
-                messageFields.style.display = 'block';
-            } else if (type === 'approve') {
-                sectionFields.style.display = 'block';
-                feedbackField.style.display = 'block';
-            } else if (type === 'edit_section') {
-                sectionFields.style.display = 'block';
-                instructionField.style.display = 'block';
-            } else if (type === 'regenerate') {
-                sectionFields.style.display = 'block';
-            }
-        });
+        // 示例点击
+        window.setExamplePrompt = function (text) {
+            messageInput.value = text;
+            messageInput.focus();
+        };
 
         // 连接
         connectBtn.addEventListener('click', connect);
-
-        // 断开
         disconnectBtn.addEventListener('click', disconnect);
-
-        // 发送消息
         sendBtn.addEventListener('click', sendMessage);
 
-        // 清空消息
-        clearMessagesBtn.addEventListener('click', clearMessages);
-
-        // 快速测试按钮
-        testPingBtn.addEventListener('click', () => sendPing());
-        testStartBtn.addEventListener('click', () => sendStart());
-        testApprovePlanBtn.addEventListener('click', () => sendApprovePlan());
-        testMessageBtn.addEventListener('click', () => sendQuickMessage());
-        testApproveSectionBtn.addEventListener('click', () => sendApproveSection('sec-1'));
-
-        // 连接函数
-        function connect() {
-            const threadId = threadIdInput.value.trim();
-            if (!threadId) {
-                alert('请输入对话ID');
-                return;
+        // Enter 发送
+        messageInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
             }
+        });
 
-            currentThreadId = threadId;
-            const wsUrl = `ws://${window.location.host}/ws/${threadId}`;
 
-            try {
-                ws = new WebSocket(wsUrl);
-
-                ws.onopen = function () {
-                    updateConnectionStatus(true);
-                    addSystemMessage('🔌 连接已建立', `对话ID: ${threadId}`);
-                    fetchStatus();
-
-                    // 自动发送一个start开始对话
-                    setTimeout(() => {
-                        if (ws && ws.readyState === WebSocket.OPEN) {
-                            addSystemMessage('💡 提示', '你可以点击"开始新对话"或发送消息');
-                        }
-                    }, 500);
-                };
-
-                ws.onmessage = function (event) {
-                    try {
-                        const data = JSON.parse(event.data);
-                        handleIncomingMessage(data);
-                    } catch (e) {
-                        addErrorMessage('解析消息失败', event.data);
-                    }
-                };
-
-                ws.onclose = function (event) {
-                    updateConnectionStatus(false);
-                    addSystemMessage('🔌 连接已关闭', `代码: ${event.code}, 原因: ${event.reason || '正常关闭'}`);
-                };
-
-                ws.onerror = function (error) {
-                    addErrorMessage('WebSocket错误', '连接失败，请确保服务已启动');
-                };
-
-            } catch (e) {
-                addErrorMessage('连接失败', e.message);
-            }
-        }
-
-        // 断开连接
         function disconnect() {
             if (ws) {
                 ws.close();
@@ -531,379 +530,414 @@
             }
         }
 
-        // 更新连接状态
         function updateConnectionStatus(connected) {
             if (connected) {
-                connectionStatus.className = 'status connected';
+                connectionStatus.className = 'status-badge status-connected';
                 connectionStatus.textContent = '已连接';
                 connectBtn.disabled = true;
                 disconnectBtn.disabled = false;
                 sendBtn.disabled = false;
-                testPingBtn.disabled = false;
-                testStartBtn.disabled = false;
-                testApprovePlanBtn.disabled = false;
-                testMessageBtn.disabled = false;
-                testApproveSectionBtn.disabled = false;
             } else {
-                connectionStatus.className = 'status disconnected';
+                connectionStatus.className = 'status-badge status-disconnected';
                 connectionStatus.textContent = '未连接';
                 connectBtn.disabled = false;
                 disconnectBtn.disabled = true;
                 sendBtn.disabled = true;
-                testPingBtn.disabled = true;
-                testStartBtn.disabled = true;
-                testApprovePlanBtn.disabled = true;
-                testMessageBtn.disabled = true;
-                testApproveSectionBtn.disabled = true;
             }
         }
 
-        // 发送消息
-        function sendMessage() {
-            if (!ws || ws.readyState !== WebSocket.OPEN) {
-                alert('WebSocket未连接');
-                return;
+        function hideWelcome() {
+            if (welcomeScreen) {
+                welcomeScreen.style.display = 'none';
+            }
+        }
+
+        function generateRequestId() {
+            return 'req_' + Math.random().toString(36).substr(2, 9);
+        }
+
+
+        function addUserMessage(content) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'message user-message';
+            wrapper.textContent = content;
+
+            const time = document.createElement('div');
+            time.className = 'message-time user-time';
+            time.textContent = new Date().toLocaleTimeString();
+
+            const container = document.createElement('div');
+            container.style.display = 'flex';
+            container.style.flexDirection = 'column';
+            container.appendChild(wrapper);
+            container.appendChild(time);
+
+            messagesContainer.appendChild(container);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function addAssistantMessage(content, isStreaming = false) {
+            if (isStreaming && streamingMessageId) {
+                // 更新现有消息
+                const existingMsg = document.getElementById(streamingMessageId);
+                if (existingMsg) {
+                    const msgDiv = existingMsg.querySelector('.message');
+                    msgDiv.innerHTML = formatContent(content);
+
+                    // 确保光标存在
+                    if (!msgDiv.querySelector('.cursor')) {
+                        const cursor = document.createElement('span');
+                        cursor.className = 'cursor';
+                        msgDiv.appendChild(cursor);
+                    }
+                    return;
+                }
             }
 
-            const type = messageType.value;
-            let message = { type: type };
+            // 创建新消息
+            const wrapper = document.createElement('div');
+            wrapper.style.display = 'flex';
+            wrapper.style.flexDirection = 'column';
 
-            switch (type) {
-                case 'ping':
-                    message.data = { timestamp: new Date().toISOString() };
-                    break;
-
-                case 'start':
-                    message.data = {
-                        title: startTitle.value || '新对话',
-                        context: {}
-                    };
-                    break;
-
-                case 'message':
-                    const content = messageContent.value.trim();
-                    if (!content) {
-                        alert('请输入消息内容');
-                        return;
-                    }
-                    message.data = {
-                        content: content,
-                        reply_to: replyTo.value || null
-                    };
-                    break;
-
-                case 'approve':
-                    message.data = {
-                        section_id: sectionId.value || undefined,
-                        feedback: feedback.value || undefined
-                    };
-                    break;
-
-                case 'edit_section':
-                    if (!sectionId.value) {
-                        alert('请输入段落ID');
-                        return;
-                    }
-                    message.data = {
-                        section_id: sectionId.value,
-                        instruction: instruction.value || '请修改这段内容'
-                    };
-                    break;
-
-                case 'regenerate':
-                    if (!sectionId.value) {
-                        alert('请输入段落ID');
-                        return;
-                    }
-                    message.data = {
-                        section_id: sectionId.value
-                    };
-                    break;
-
-                case 'cancel':
-                    message.data = {};
-                    break;
+            if (isStreaming) {
+                streamingMessageId = 'msg_' + Date.now();
+                wrapper.id = streamingMessageId;
             }
 
-            // 添加请求ID
-            message.request_id = 'req_' + Math.random().toString(36).substr(2, 9);
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message assistant-message ${isStreaming ? 'streaming-message' : ''}`;
+            msgDiv.innerHTML = formatContent(content);
 
-            ws.send(JSON.stringify(message));
-            addSentMessage(type, message.data, message.request_id);
-            updateLastActivity();
+            if (isStreaming) {
+                const cursor = document.createElement('span');
+                cursor.className = 'cursor';
+                msgDiv.appendChild(cursor);
+            }
+
+            const time = document.createElement('div');
+            time.className = 'message-time';
+            time.textContent = new Date().toLocaleTimeString();
+
+            wrapper.appendChild(msgDiv);
+            wrapper.appendChild(time);
+            messagesContainer.appendChild(wrapper);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
 
-        // 快速测试函数
-        function sendPing() {
-            messageType.value = 'ping';
-            messageType.dispatchEvent(new Event('change'));
-            sendMessage();
+        function addSystemMessage(content) {
+            const wrapper = document.createElement('div');
+            wrapper.style.display = 'flex';
+            wrapper.style.justifyContent = 'center';
+
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'message system-message';
+            msgDiv.textContent = content;
+
+            wrapper.appendChild(msgDiv);
+            messagesContainer.appendChild(wrapper);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
 
-        function sendStart() {
-            messageType.value = 'start';
-            messageType.dispatchEvent(new Event('change'));
-            sendMessage();
+        function addErrorMessage(content) {
+            const wrapper = document.createElement('div');
+            wrapper.style.display = 'flex';
+            wrapper.style.justifyContent = 'center';
+
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'message system-message';
+            msgDiv.style.backgroundColor = '#3a2a2a';
+            msgDiv.style.color = '#ff6b6b';
+            msgDiv.style.borderColor = '#ff6b6b';
+            msgDiv.textContent = '❌ ' + content;
+
+            wrapper.appendChild(msgDiv);
+            messagesContainer.appendChild(wrapper);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
 
-        function sendApprovePlan() {
-            messageType.value = 'approve';
-            messageType.dispatchEvent(new Event('change'));
-            sectionId.value = '';
-            feedback.value = '';
-            sendMessage();
+        function formatContent(content) {
+            return content
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/```(.*?)```/gs, '<pre><code>$1</code></pre>')
+                .replace(/`(.*?)`/g, '<code>$1</code>')
+                .replace(/\n/g, '<br>');
         }
 
-        function sendQuickMessage() {
-            messageType.value = 'message';
-            messageType.dispatchEvent(new Event('change'));
-            messageContent.value = '帮我写一份关于AI医疗的报告';
-            sendMessage();
+        function showOutline(sections) {
+            currentOutline = sections;
+            currentPhase = 'reviewing';
+
+            const wrapper = document.createElement('div');
+            wrapper.style.display = 'flex';
+            wrapper.style.flexDirection = 'column';
+
+            const card = document.createElement('div');
+            card.className = 'outline-card';
+
+            const title = document.createElement('div');
+            title.className = 'outline-title';
+            title.textContent = '📋 生成的大纲';
+
+            card.appendChild(title);
+
+            sections.forEach((section, index) => {
+                const item = document.createElement('div');
+                item.className = 'outline-item';
+                item.textContent = `${index + 1}. ${section.title || section}`;
+                card.appendChild(item);
+            });
+
+            wrapper.appendChild(card);
+            messagesContainer.appendChild(wrapper);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            // 更新报告预览
+            updateReportPreview(sections);
         }
 
-        function sendApproveSection(sectionIdValue) {
-            messageType.value = 'approve';
-            messageType.dispatchEvent(new Event('change'));
-            sectionId.value = sectionIdValue;
-            feedback.value = '';
-            sendMessage();
+        function showConfirmation(question, options) {
+            const wrapper = document.createElement('div');
+            wrapper.style.display = 'flex';
+            wrapper.style.flexDirection = 'column';
+            wrapper.style.alignItems = 'center';
+
+            const box = document.createElement('div');
+            box.className = 'confirmation-box';
+
+            const qDiv = document.createElement('div');
+            qDiv.className = 'confirmation-question';
+            qDiv.textContent = question;
+
+            const optionsDiv = document.createElement('div');
+            optionsDiv.className = 'confirmation-options';
+
+            options.forEach(option => {
+                const btn = document.createElement('button');
+                btn.className = `option-btn option-${getOptionClass(option)}`;
+                btn.textContent = option;
+                btn.onclick = () => handleOption(option);
+                optionsDiv.appendChild(btn);
+            });
+
+            box.appendChild(qDiv);
+            box.appendChild(optionsDiv);
+            wrapper.appendChild(box);
+            messagesContainer.appendChild(wrapper);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
 
-        // 处理接收到的消息
-        function handleIncomingMessage(data) {
+        function getOptionClass(option) {
+            switch (option) {
+                case '确认': return 'confirm';
+                case '修改': return 'edit';
+                case '重写': return 'regenerate';
+                default: return '';
+            }
+        }
+
+        function handleOption(option) {
+            if (!ws) return;
+
+            addUserMessage(`[选择] ${option}`);
+
+            if (option === '确认') {
+                currentPhase = 'writing';
+                ws.send(JSON.stringify({
+                    type: 'approve',
+                    data: {},
+                    request_id: generateRequestId()
+                }));
+            } else if (option === '修改') {
+                currentPhase = 'editing';
+                // 等待用户输入修改意见
+                messageInput.placeholder = '请输入修改意见...';
+            }
+        }
+
+        function updateReportPreview(sections) {
+            let html = '';
+            sections.forEach((section, index) => {
+                html += `
+                    <div class="report-section">
+                        <div class="section-title">${index + 1}. ${section.title || section}</div>
+                        <div class="section-content">${section.content || '等待生成...'}</div>
+                    </div>
+                `;
+            });
+            reportContent.innerHTML = html;
+        }
+
+        function updateSectionContent(sectionId, content) {
+            // 更新报告预览中的段落内容
+            const sections = document.querySelectorAll('.report-section');
+            // 这里需要根据实际情况更新
+        }
+
+        function handleMessage(data) {
             const type = data.type;
             const eventData = data.data || {};
-            const timestamp = data.timestamp || new Date().toISOString();
-            const requestId = data.request_id;
 
-            let title = '';
-            let content = '';
-            let messageType_class = 'system';
-            let eventClass = 'sync';
-
-            // 尝试更新当前阶段
-            if (eventData.phase) {
-                currentPhaseSpan.textContent = eventData.phase;
-            }
+            console.log('收到消息:', type, eventData);
 
             switch (type) {
-                case 'sync':
-                    title = `🔄 同步 [${eventData.type || 'unknown'}]`;
-
-                    if (eventData.type === 'history' && eventData.messages) {
-                        // 显示所有历史消息
-                        content = `共 ${eventData.total || eventData.messages.length} 条历史消息:\n`;
-                        eventData.messages.forEach(msg => {
-                            const time = new Date(msg.created_at).toLocaleTimeString();
-                            content += `\n[${time}] ${msg.role}: ${msg.content.substring(0, 50)}${msg.content.length > 50 ? '...' : ''}`;
-                        });
-                    } else {
-                        content = JSON.stringify(eventData, null, 2);
-                    }
-
-                    addMessage('system', title, content, timestamp, 'sync');
-                    break;
-
                 case 'chunk':
-                    title = `📝 流式块`;
-                    content = `[${eventData.section_id || '未知段落'}]: ${eventData.text}`;
-                    messageType_class = 'assistant';
-                    eventClass = 'chunk';
+                    // 流式输出大纲
+                    if (eventData.section === 'outline') {
+                        streamingContent += eventData.content || '';
+                        addAssistantMessage(streamingContent, true);
+                    }
                     break;
 
                 case 'complete':
-                    title = `✅ 完成 [${eventData.message_id}]`;
-                    content = `完整内容: ${eventData.full_content ? eventData.full_content.substring(0, 150) + '...' : ''}`;
-                    if (eventData.metadata) {
-                        content += `\n元数据: ${JSON.stringify(eventData.metadata)}`;
+                    // 流式完成
+                    if (eventData.sections) {
+                        streamingMessageId = null;
+                        streamingContent = '';
+                        showOutline(eventData.sections);
                     }
-                    messageType_class = 'assistant';
-                    eventClass = 'complete';
+                    break;
+
+                case 'outline_complete':
+                    // 大纲生成完成
+                    streamingMessageId = null;
+                    streamingContent = '';
+                    if (eventData.sections) {
+                        showOutline(eventData.sections);
+                    }
+                    if (eventData.pending_question) {
+                        showConfirmation(eventData.pending_question, eventData.pending_options);
+                    }
                     break;
 
                 case 'prompt':
-                    title = `❓ 需要确认`;
-                    content = `问题: ${eventData.question || ''}\n选项: ${(eventData.options || []).join(', ')}`;
-                    if (eventData.context) {
-                        content += `\n上下文: ${JSON.stringify(eventData.context)}`;
-                    }
-                    eventClass = 'prompt';
+                    // 显示确认框
+                    showConfirmation(eventData.question, eventData.options);
                     break;
 
                 case 'section_ready':
-                    title = `📄 段落就绪 [${eventData.section_id}]`;
-                    content = `标题: ${eventData.title || ''}\n`;
-                    content += `内容: ${eventData.content ? eventData.content.substring(0, 150) + '...' : ''}\n`;
-                    content += `问题: ${eventData.question || ''}\n选项: ${(eventData.options || []).join(', ')}`;
-                    eventClass = 'section_ready';
+                    // 段落就绪
+                    addAssistantMessage(`📝 **${eventData.title}**\n\n${eventData.content}`);
+                    updateSectionContent(eventData.section_id, eventData.content);
+                    showConfirmation(eventData.question, eventData.options);
                     break;
 
                 case 'section_updated':
-                    title = `✏️ 段落已更新 [${eventData.section_id}]`;
-                    content = `版本: ${eventData.version || 1}\n`;
-                    content += `状态: ${eventData.status || ''}\n`;
-                    content += `新内容: ${eventData.content ? eventData.content.substring(0, 150) + '...' : ''}`;
-                    eventClass = 'section_updated';
-                    break;
-
-                case 'state_change':
-                    title = `🔄 状态变更`;
-                    content = `新阶段: ${eventData.phase || 'unknown'}`;
-                    if (eventData.current_section) {
-                        content += `\n当前段落: ${eventData.current_section}`;
-                    }
-                    eventClass = 'state_change';
+                    // 段落更新
+                    updateSectionContent(eventData.section_id, eventData.content);
+                    addAssistantMessage(`✏️ 段落已更新 (v${eventData.version})`);
                     break;
 
                 case 'report_completed':
-                    title = `🎉 报告完成`;
-                    content = `总段落: ${eventData.total_sections || 0}\n`;
-                    content += `总字数: ${eventData.total_words || 0}\n`;
-                    content += `可导出格式: ${(eventData.export_formats || []).join(', ')}`;
-                    eventClass = 'report_completed';
+                    // 报告完成
+                    addSystemMessage('🎉 报告已全部完成！');
+                    currentPhase = 'completed';
                     break;
 
-                case 'task_progress':
-                    title = `⏳ 任务进度 [${eventData.task_id}]`;
-                    content = `${Math.round((eventData.progress || 0) * 100)}% - ${eventData.message || ''}`;
-                    if (eventData.status) {
-                        content += `\n状态: ${eventData.status}`;
+                case 'sync':
+                    if (eventData.type === 'history' && eventData.messages) {
+                        // 显示历史消息
+                        hideWelcome();
+                        eventData.messages.forEach(msg => {
+                            if (msg.role === 'user') {
+                                addUserMessage(msg.content);
+                            } else if (msg.role === 'assistant') {
+                                addAssistantMessage(msg.content);
+                            }
+                        });
+                    } else if (eventData.type === 'state' && eventData.sections) {
+                        showOutline(eventData.sections);
+                        if (eventData.pending_question) {
+                            showConfirmation(eventData.pending_question, eventData.pending_options);
+                        }
                     }
-                    eventClass = 'task_progress';
-                    break;
-
-                case 'interrupt':
-                    title = `⚠️ 需要介入`;
-                    content = `原因: ${eventData.reason || ''}`;
-                    if (eventData.question) content += `\n问题: ${eventData.question}`;
-                    if (eventData.options) content += `\n选项: ${eventData.options.join(', ')}`;
-                    if (eventData.section_id) content += `\n段落: ${eventData.section_id}`;
-                    eventClass = 'interrupt';
                     break;
 
                 case 'error':
-                    title = `❌ 错误 [${eventData.code}]`;
-                    content = eventData.message || '';
-                    if (eventData.details) {
-                        content += `\n详情: ${JSON.stringify(eventData.details)}`;
-                    }
-                    messageType_class = 'error';
-                    eventClass = 'error';
+                    addErrorMessage(`${eventData.code}: ${eventData.message}`);
                     break;
-
-                case 'pong':
-                    title = `🏓 PONG`;
-                    content = `服务器时间: ${eventData.timestamp || ''}`;
-                    if (eventData.echo) {
-                        content += `\n回显: ${JSON.stringify(eventData.echo)}`;
-                    }
-                    eventClass = 'pong';
-                    break;
-
-                default:
-                    title = `📥 未知类型: ${type}`;
-                    content = JSON.stringify(data, null, 2);
-                    eventClass = 'unknown';
             }
-
-            // 添加时间戳和请求ID到内容
-            if (requestId) {
-                content += `\n\n请求ID: ${requestId}`;
-            }
-            content += `\n时间: ${new Date(timestamp).toLocaleTimeString()}`;
-
-            addMessage(messageType_class, title, content, timestamp, eventClass);
-
-            messageCount++;
-            totalMessagesSpan.textContent = messageCount;
-            updateLastActivity();
         }
 
-        // 添加发送的消息到日志
-        function addSentMessage(type, data, requestId) {
-            const title = `📤 发送 [${type}]`;
-            let content = JSON.stringify(data, null, 2);
-            if (requestId) {
-                content += `\n\n请求ID: ${requestId}`;
-            }
-            addMessage('user', title, content, new Date().toISOString(), 'sent');
-        }
 
-        // 添加系统消息
-        function addSystemMessage(title, content) {
-            addMessage('system', title, content, new Date().toISOString(), 'system');
-        }
 
-        // 添加错误消息
-        function addErrorMessage(title, content) {
-            addMessage('error', title, content, new Date().toISOString(), 'error');
-        }
+        function connect() {
+            const threadId = threadIdInput.value.trim();
+            if (!threadId) return;
 
-        // 添加消息到界面
-        function addMessage(role, title, content, timestamp, eventType) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${role}-message`;
+            currentThreadId = threadId;
+            const wsUrl = `ws://${window.location.host}/ws/${threadId}`;
 
-            const headerDiv = document.createElement('div');
-            headerDiv.className = 'message-header';
-
-            const leftSpan = document.createElement('span');
-
-            const typeSpan = document.createElement('span');
-            typeSpan.className = `event-type event-type-${eventType}`;
-            typeSpan.textContent = eventType.toUpperCase();
-
-            leftSpan.appendChild(typeSpan);
-            leftSpan.appendChild(document.createTextNode(` ${title}`));
-
-            const timeSpan = document.createElement('span');
-            timeSpan.className = 'timestamp';
-            timeSpan.textContent = new Date(timestamp).toLocaleTimeString();
-
-            headerDiv.appendChild(leftSpan);
-            headerDiv.appendChild(timeSpan);
-
-            const contentDiv = document.createElement('div');
-            contentDiv.className = 'message-content';
-            contentDiv.textContent = content;
-
-            messageDiv.appendChild(headerDiv);
-            messageDiv.appendChild(contentDiv);
-
-            messagesDiv.appendChild(messageDiv);
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        }
-
-        // 清空消息
-        function clearMessages() {
-            messagesDiv.innerHTML = '';
-            messageCount = 0;
-            totalMessagesSpan.textContent = '0';
-            currentPhaseSpan.textContent = '-';
-        }
-
-        // 更新最后活动时间
-        function updateLastActivity() {
-            lastActivitySpan.textContent = new Date().toLocaleTimeString();
-        }
-
-        // 获取服务器状态
-        async function fetchStatus() {
             try {
-                const response = await fetch('/ws/status');
-                const data = await response.json();
-                activeConnectionsSpan.textContent = data.active_conversations || 0;
-                agentStatusSpan.textContent = data.agent_ready ? '就绪' : '未就绪';
+                ws = new WebSocket(wsUrl);
+
+                ws.onopen = () => {
+                    updateConnectionStatus(true);
+                    hideWelcome();
+                    addSystemMessage('✅ 已连接到服务器');
+                    addSystemMessage('💡 请输入你的报告需求，例如："帮我写一份关于AI医疗的报告"');
+
+                    // 不自动发送 start，等待用户输入
+                };
+
+                ws.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    handleMessage(data);
+                };
+
+                ws.onclose = () => {
+                    updateConnectionStatus(false);
+                    addSystemMessage('🔌 连接已断开');
+                };
+
+                ws.onerror = () => {
+                    addErrorMessage('连接错误');
+                };
+
             } catch (e) {
-                console.error('获取状态失败', e);
+                addErrorMessage('连接失败: ' + e.message);
             }
         }
 
-        // 定期更新状态
-        setInterval(fetchStatus, 5000);
+        function sendMessage() {
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                alert('请先连接');
+                return;
+            }
 
-        // 初始获取状态
-        fetchStatus();
+            const content = messageInput.value.trim();
+            if (!content) return;
+
+            // 添加用户消息
+            addUserMessage(content);
+
+            // 判断是第一次发送消息还是后续对话
+            const hasHistory = document.querySelectorAll('.user-message').length > 1; // 排除刚发的这条
+
+            if (!hasHistory) {
+                // 第一次发送消息，用 start 事件
+                ws.send(JSON.stringify({
+                    type: 'start',
+                    data: {
+                        title: content.substring(0, 30) + '...',  // 用消息内容作为标题
+                        context: {}
+                    },
+                    request_id: generateRequestId()
+                }));
+            } else {
+                // 后续消息用 message 事件
+                ws.send(JSON.stringify({
+                    type: 'message',
+                    data: { content: content },
+                    request_id: generateRequestId()
+                }));
+            }
+
+            messageInput.value = '';
+        }
     </script>
 </body>
 

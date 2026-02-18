@@ -13,6 +13,12 @@ from models.state import (
     Conversation, Message, Section,
     Phase, SectionStatus, MessageRole
 )
+from api.controllers import websocket_controller  # 导入WebSocket控制器（阶段1.2）
+
+import json
+import re
+import time
+import random
 
 
 class ConversationStore:
@@ -167,8 +173,13 @@ class ConversationStore:
         """添加段落"""
         if not self.conversation:
             await self._load_from_db()
-            
-        section_id = f"sec-{len(self.conversation.sections) + 1}"
+        
+        # 生成唯一的序号 ID
+        # 组合：时间戳 + 随机数 + 序号
+        timestamp = int(time.time() * 1000)
+        random_num = random.randint(1000, 9999)
+        section_id = f"sec-{timestamp}-{random_num}-{len(self.conversation.sections) + 1}"
+        # section_id = f"sec-{len(self.conversation.sections) + 1}"
         
         section = Section(
             id=section_id,
@@ -212,29 +223,184 @@ class ConversationStore:
         return None
     
     # ==================== 业务逻辑 ====================
-    
-    async def generate_report(self, topic: str):
-        """生成报告（规划大纲）"""
+    async def generate_report_stream(self, topic: str):
+        """流式生成报告大纲"""
         if not self.conversation:
             await self._load_from_db()
-            
+        
         self.conversation.title = topic
         self.conversation.phase = Phase.PLANNING
         
-        # 创建大纲段落（示例）
-        sections = [
-            await self.add_section("引言", order=1),
-            await self.add_section("主体", order=2),
-            await self.add_section("结论", order=3)
-        ]
+        prompt = f"""
+        请为报告主题「{topic}」规划一个详细的大纲。
+
+        要求：
+        1. 遵循 report-writing Skill 规范
+        2. 大纲需要包含3-5个主要章节
+        3. 每个章节必须有明确的主题
+        4. 以JSON数组格式返回，每个元素是章节标题
+        5. 不要返回任何其他内容，只返回JSON数组
+
+        示例输出格式：
+        ["引言", "市场现状分析", "技术发展趋势", "应用案例", "结论与建议"]
+
+        请生成大纲：
+        """
+        
+        print(f"📋 流式生成大纲，主题: {topic}")
+        
+        agent = websocket_controller.get_agent()
+        full_content = ""
+        
+        try:
+            # 流式模式
+            async for chunk in agent.run([{"role": "user", "content": prompt}], stream=True):
+                if chunk.get("type") == "chunk":
+                    text = chunk.get("content", "")
+                    full_content += text
+                    yield {
+                        "type": "chunk",
+                        "content": text,
+                        "section": "outline",
+                        "done": False
+                    }
+                elif chunk.get("type") == "complete":
+                    full_content = chunk.get("content", "")
+                    # 解析完整内容
+                    sections = self._parse_outline_from_response(full_content)
+                    
+                    # 确保至少有3个章节
+                    if not sections or len(sections) < 3:
+                        print(f"⚠️ 解析出 {len(sections) if sections else 0} 个章节，使用默认大纲")
+                        sections = ["引言", "主体", "结论"]
+                    
+                    # 创建大纲段落
+                    created_sections = []
+                    for i, title in enumerate(sections):
+                        section = await self.add_section(
+                            title=title,
+                            order=i+1,
+                            status=SectionStatus.DRAFT
+                        )
+                        created_sections.append(section)
+                        print(f"   📄 创建段落: {title}")
+                    
+                    # 设置等待用户确认
+                    self.conversation.pending_question = "大纲已生成，您满意吗？"
+                    self.conversation.pending_options = ["确认", "修改大纲"]
+                    await self._save()
+                    print("x"* 50)
+                    # 发送完成信号
+                    yield {
+                        "type": "outline_complete",
+                        "full_content": full_content,
+                        "sections": [s.to_dict() for s in created_sections],
+                        "pending_question": self.conversation.pending_question,
+                        "pending_options": self.conversation.pending_options
+                    }
+                    
+        except Exception as e:
+            print(f"❌ 调用Agent失败: {e}")
+            yield {
+                "type": "error",
+                "message": str(e)
+            }
+
+
+    async def generate_report(self, topic: str) -> List[Section]:
+        """非流式生成报告大纲（直接返回段落列表）"""
+        if not self.conversation:
+            await self._load_from_db()
+        
+        self.conversation.title = topic
+        self.conversation.phase = Phase.PLANNING
+        
+        prompt = f"""
+    请为报告主题「{topic}」规划一个详细的大纲。
+
+    要求：
+    1. 遵循 report-writing Skill 规范
+    2. 大纲需要包含3-5个主要章节
+    3. 每个章节必须有明确的主题
+    4. 以JSON数组格式返回，每个元素是章节标题
+    5. 不要返回任何其他内容，只返回JSON数组
+
+    示例输出格式：
+    ["引言", "市场现状分析", "技术发展趋势", "应用案例", "结论与建议"]
+
+    请生成大纲：
+    """
+        
+        print(f"📋 非流式生成大纲，主题: {topic}")
+        
+        agent = websocket_controller.get_agent()
+        sections = ["引言", "主体", "结论"]  # 默认值
+        
+        try:
+            # 非流式模式
+            async for response in agent.run([{"role": "user", "content": prompt}], stream=False):
+                if response.get("type") == "complete":
+                    content = response.get("content", "")
+                    print(f"📥 Agent返回: {content[:200]}...")
+                    sections = self._parse_outline_from_response(content)
+                    
+                    if not sections or len(sections) < 3:
+                        print(f"⚠️ 解析出 {len(sections) if sections else 0} 个章节，使用默认大纲")
+                        sections = ["引言", "主体", "结论"]
+                    break
+        except Exception as e:
+            print(f"❌ 调用Agent失败: {e}")
+        
+        # 创建大纲段落
+        created_sections = []
+        for i, title in enumerate(sections):
+            section = await self.add_section(
+                title=title,
+                order=i+1,
+                status=SectionStatus.DRAFT
+            )
+            created_sections.append(section)
+            print(f"   📄 创建段落: {title}")
         
         # 设置等待用户确认
         self.conversation.pending_question = "大纲已生成，您满意吗？"
         self.conversation.pending_options = ["确认", "修改大纲"]
         
         await self._save()
-        return sections
+        
+        return created_sections
+
+    def _parse_outline_from_response(self, content: str) -> List[str]:
+        """从Agent响应中解析大纲"""
     
+        
+        # 尝试直接解析JSON
+        try:
+            # 查找JSON数组
+            json_match = re.search(r'\[.*\]', content, re.DOTALL)
+            if json_match:
+                sections = json.loads(json_match.group())
+                if isinstance(sections, list) and all(isinstance(s, str) for s in sections):
+                    return sections
+        except:
+            pass
+        
+        # 尝试按行解析（每行一个章节）
+        lines = content.strip().split('\n')
+        sections = []
+        for line in lines:
+            # 去除序号和标点
+            cleaned = re.sub(r'^\d+[\.\)、]\s*', '', line.strip())
+            cleaned = re.sub(r'^[-\*]\s*', '', cleaned)
+            if cleaned and len(cleaned) < 50 and not cleaned.startswith('```'):
+                sections.append(cleaned)
+        
+        if len(sections) >= 3:
+            return sections
+        
+        return []
+    
+
     async def approve_plan(self):
         """确认大纲，开始写作"""
         if not self.conversation:

@@ -6,7 +6,7 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from typing import Dict, Optional
 import asyncio
 from loguru import logger
-from datetime import datetime
+from datetime import datetime, timezone
 import uuid
 
 from store.conversation_store import ConversationStore
@@ -148,7 +148,7 @@ async def handle_ping(
 ):
     """处理心跳"""
     pong_data = PongEventData(
-        timestamp=datetime.utcnow().isoformat(),
+        timestamp=datetime.now(timezone.utc).isoformat(),
         echo=data
     )
     
@@ -156,7 +156,7 @@ async def handle_ping(
         type=EventType.PONG,
         data=pong_data.to_dict(),
         request_id=request_id,
-        timestamp=datetime.utcnow()
+        timestamp=datetime.now(timezone.utc)
     ).to_dict())
     
     logger.debug(f"💓 心跳响应: {thread_id}")
@@ -170,10 +170,14 @@ async def handle_start(
     request_id: Optional[str] = None
 ):
     """开始新对话"""
+    
+    print("handle_start data:", data)  # 调试输出，查看前端发送的数据结构
+    print("-" * 50)
     try:
         start_data = StartEventData.from_dict(data)
         
         if conv.messages:
+            print("已有对话，返回当前状态")  # 调试输出
             # 已有对话，返回当前状态
             await websocket.send_json(ServerEvent(
                 type=EventType.SYNC,
@@ -188,28 +192,36 @@ async def handle_start(
                     }
                 ).to_dict(),
                 request_id=request_id,
-                timestamp=datetime.utcnow()
+                timestamp=datetime.now(timezone.utc)
             ).to_dict())
         else:
-            # 新对话，生成报告
-            await conv.generate_report(start_data.title or "新对话")
-            
-            # 发送大纲确认提示
-            if conv.conversation.pending_question:
-                await websocket.send_json(ServerEvent(
-                    type=EventType.PROMPT,
-                    data=PromptEventData(
-                        question=conv.conversation.pending_question,
-                        options=conv.conversation.pending_options
-                    ).to_dict(),
-                    request_id=request_id,
-                    timestamp=datetime.utcnow()
-                ).to_dict())
+            # 新对话，生成报告（使用流式模式）
+            async for chunk in conv.generate_report_stream(
+                topic=start_data.title or "新对话",
+            ):
+                print("handle_start chunk:", chunk)  # 调试输出，查看流式返回的数据结构
+                if chunk["type"] == "outline_complete":
+                    # 大纲完成，发送确认提示
+                    await websocket.send_json(ServerEvent(
+                        type=EventType.PROMPT,
+                        data=PromptEventData(
+                            question=chunk["pending_question"],
+                            options=chunk["pending_options"]
+                        ).to_dict(),
+                        request_id=request_id
+                    ).to_dict())
+                elif chunk["type"] == "error":
+                    await send_error(websocket, thread_id, "GENERATE_ERROR", chunk["message"], request_id=request_id)
+                else:
+                    # 流式内容
+                    await websocket.send_json(ServerEvent(
+                        type=EventType.CHUNK,
+                        data=chunk,
+                        request_id=request_id
+                    ).to_dict())
             
     except Exception as e:
-        logger.error(f"❌ 开始对话失败: {e}")
         await send_error(websocket, thread_id, "START_FAILED", str(e), request_id=request_id)
-
 
 async def handle_message(
     websocket: WebSocket,
@@ -242,7 +254,7 @@ async def handle_message(
             type=EventType.SYNC,
             data={"type": "message_received", "message_id": user_msg.id},
             request_id=request_id,
-            timestamp=datetime.utcnow()
+            timestamp=datetime.now(timezone.utc)
         ).to_dict())
         
         # 获取Agent回复
@@ -266,7 +278,7 @@ async def handle_message(
                         message_id=message_id
                     ).to_dict(),
                     request_id=request_id,
-                    timestamp=datetime.utcnow()
+                    timestamp=datetime.now(timezone.utc)
                 ).to_dict())
                 
             elif chunk.get("type") == "complete":
@@ -285,7 +297,7 @@ async def handle_message(
                         metadata=chunk.get("metadata", {})
                     ).to_dict(),
                     request_id=request_id,
-                    timestamp=datetime.utcnow()
+                    timestamp=datetime.now(timezone.utc)
                 ).to_dict())
                 
     except Exception as e:
@@ -317,7 +329,7 @@ async def handle_approve(
                         total_words=sum(len(s.content) for s in conv.sections)
                     ).to_dict(),
                     request_id=request_id,
-                    timestamp=datetime.utcnow()
+                    timestamp=datetime.now(timezone.utc)
                 ).to_dict())
             else:
                 # 继续下一段
@@ -326,7 +338,7 @@ async def handle_approve(
                     data={"phase": conv.conversation.phase.value, 
                           "current_section": conv.conversation.current_section_id},
                     request_id=request_id,
-                    timestamp=datetime.utcnow()
+                    timestamp=datetime.now(timezone.utc)
                 ).to_dict())
         else:
             # 确认大纲
@@ -341,7 +353,7 @@ async def handle_approve(
                         options=conv.conversation.pending_options
                     ).to_dict(),
                     request_id=request_id,
-                    timestamp=datetime.utcnow()
+                    timestamp=datetime.now(timezone.utc)
                 ).to_dict())
             
     except Exception as e:
@@ -383,7 +395,7 @@ async def handle_edit_section(
                     status=section.status.value
                 ).to_dict(),
                 request_id=request_id,
-                timestamp=datetime.utcnow()
+                timestamp=datetime.now(timezone.utc)
             ).to_dict())
             
             # 询问是否满意
@@ -395,7 +407,7 @@ async def handle_edit_section(
                         options=conv.conversation.pending_options
                     ).to_dict(),
                     request_id=request_id,
-                    timestamp=datetime.utcnow()
+                    timestamp=datetime.now(timezone.utc)
                 ).to_dict())
         
     except Exception as e:
@@ -447,7 +459,7 @@ async def handle_regenerate(
                     status=section.status.value
                 ).to_dict(),
                 request_id=request_id,
-                timestamp=datetime.utcnow()
+                timestamp=datetime.now(timezone.utc)
             ).to_dict())
             
             # 询问是否满意
@@ -462,7 +474,7 @@ async def handle_regenerate(
                     options=conv.conversation.pending_options
                 ).to_dict(),
                 request_id=request_id,
-                timestamp=datetime.utcnow()
+                timestamp=datetime.now(timezone.utc)
             ).to_dict())
         
     except Exception as e:
@@ -487,7 +499,7 @@ async def handle_cancel(
         type=EventType.SYNC,
         data={"type": "cancelled", "message": "操作已取消"},
         request_id=request_id,
-        timestamp=datetime.utcnow()
+        timestamp=datetime.now(timezone.utc)
     ).to_dict())
 
 
@@ -503,7 +515,7 @@ async def send_sync_state(websocket: WebSocket, thread_id: str, conv: Conversati
             type="connected",
             thread_id=thread_id
         ).to_dict(),
-        timestamp=datetime.utcnow()
+        timestamp=datetime.now(timezone.utc)
     ).to_dict())
     
     # 2. 发送所有历史消息（不仅仅是最近10条）
@@ -527,7 +539,7 @@ async def send_sync_state(websocket: WebSocket, thread_id: str, conv: Conversati
                 total=len(conv.messages),
                 shown=len(all_messages)
             ).to_dict(),
-            timestamp=datetime.utcnow()
+            timestamp=datetime.now(timezone.utc)
         ).to_dict())
         
         logger.info(f"📜 发送历史消息 {len(all_messages)} 条给 {thread_id}")
@@ -544,7 +556,7 @@ async def send_sync_state(websocket: WebSocket, thread_id: str, conv: Conversati
             pending_question=conv.conversation.pending_question,
             pending_options=conv.conversation.pending_options
         ).to_dict(),
-        timestamp=datetime.utcnow()
+        timestamp=datetime.now(timezone.utc)
     ).to_dict())
 
 
@@ -565,7 +577,7 @@ async def send_error(
             details=details or {}
         ).to_dict(),
         request_id=request_id,
-        timestamp=datetime.utcnow()
+        timestamp=datetime.now(timezone.utc)
     ).to_dict())
 
 
