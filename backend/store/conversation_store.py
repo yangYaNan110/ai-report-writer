@@ -88,7 +88,7 @@ class ConversationStore:
         # - 用户如果不满意 就根据用户的反馈进行修改。 
         # - 这个过程是一个循环 直到用户确认报告完成。
 
-
+        print("005...",datetime.now(timezone.utc).isoformat())
         # 如果有正在运行的，取消它
         if interrupt:
             try:
@@ -102,7 +102,7 @@ class ConversationStore:
             except asyncio.CancelledError:
                 pass
             finally:
-                assistant_content = {"role": "assistant", "content": self.full_response, "timestamp": datetime.now(timezone.utc)}
+                assistant_content = {"role": "assistant", "content": self.full_response, "timestamp": datetime.now(timezone.utc).isoformat()}
                 self.history.append(assistant_content)
                 await self._save(assistant_content)  # 保存对话状态到数据库 数据库方面以后再处理        
                 self.full_response= ""
@@ -121,7 +121,7 @@ class ConversationStore:
 
         # 保存用户输入
         if user_input:
-            current_content = {"role": "user", "content": user_input, "timestamp": datetime.now(timezone.utc)}
+            current_content = {"role": "user", "content": user_input, "timestamp": datetime.now(timezone.utc).isoformat()}
             self.history.append(current_content)
             await self._save(current_content)  # 保存对话状态到数据库
 
@@ -132,23 +132,30 @@ class ConversationStore:
        
             
         print(f"🔄 before...." * 20)
+        print(prompt)
         # 等待并yield结果
         try:
             # 从任务中获取异步生成器
             async for chunk in self.agent.run([{"role": "user", "content": prompt}], stream=True):
+
                 # 关键：每次迭代都检查是否被打断
                 chunk_type = chunk.get("type", "chunk")
+                print("*" * 50)
+                print(chunk_type)
                 if self._cancel_event.is_set():
                     print("⏹️ 检测到取消标志，提前终止生成")
                     break  # 立即停止生成
                 if chunk_type == "chunk":
                     text = chunk.get("content", "")
                     self.full_response += text
+                    print(text,"\n")
                     yield {"type": "chunk", "content": text}
                 else:
                     # 只有在没有被取消的情况下才保存
+                    print("=" * 30)
+                    print(chunk_type)
                     if not self._cancel_event.is_set():
-                        assistant_content = {"role": "assistant", "content": self.full_response, "timestamp": datetime.now(timezone.utc)}
+                        assistant_content = {"role": "assistant", "content": self.full_response, "timestamp": datetime.now(timezone.utc).isoformat()}
                         self.history.append(assistant_content)
                         await self._save(assistant_content)  # 保存对话状态到数据库 数据库方面以后再处理
                         self.full_response= ""

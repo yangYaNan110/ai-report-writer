@@ -102,11 +102,8 @@ function handleSend() {
     
     const hasHistory = state.messages.length > 0;
     
-    if (!hasHistory || state.currentPhase === 'idle') {
-        AppStoreInstance.sendMessage('start', { title: content });
-    } else {
-        AppStoreInstance.sendMessage('message', { content });
-    }
+    
+    AppStoreInstance.sendMessage('message', { content });
     
     elements.messageInput.value = '';
     elements.messageInput.style.height = 'auto';

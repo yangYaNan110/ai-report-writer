@@ -62,7 +62,7 @@ async def websocket_endpoint(websocket: WebSocket, thread_id: str):
         while True:
             data = await websocket.receive_json()
             logger.debug(f"📥 收到消息 {thread_id}: {data.get("content")},{data.get("interrupt")}")
-            
+            data = data.get("data", "")
             await handle_websocket_message(conv, data)
             
     except WebSocketDisconnect:
@@ -83,6 +83,8 @@ async def handle_websocket_message(
     data: Dict
 ):
     """处理消息"""
+    print(data,"006...")
+    
     user_input = data.get("content", "")
     interrupt = data.get("interrupt", False)
     

@@ -37,7 +37,7 @@ async def lifespan(app: FastAPI):
     # 2. 初始化 Agent（全局单例）
     global agent
     # agent = ReportAgent()
-    agent = ReportAgent(skill_names=[ "report-assistant"])
+    agent = ReportAgent(skill_names=["report-assistant"])
 
 
     websocket_controller.set_agent(agent)  # 将Agent实例传递给WebSocket控制器

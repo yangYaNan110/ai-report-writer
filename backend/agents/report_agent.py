@@ -51,7 +51,7 @@ class ReportAgent:
         # 加载skills（如果指定了skill_names）
         
         # 基础指令
-        
+        print("skill_names...", skill_names)
         self.agent = Agent(
             model=DashScope(
                 id=model_id,
@@ -65,7 +65,8 @@ class ReportAgent:
                 "不确定时如实告知，不编造信息",
                 "保持友好的对话风格",
             ],
-            skills = self._load_skills(skill_names) if skill_names else None
+            description="我是一个专业的报告写作助手，可以帮助你撰写技术报告、市场分析、学术综述等各种类型的报告。",
+            skills=self._load_skills(skill_names)
 
         )
         print(f"✅ Agent初始化完成，使用模型: {model_id}")
@@ -82,6 +83,7 @@ class ReportAgent:
         Returns:
             Skills对象或None（如果加载失败）
         """
+        print(f"📂 开始加载Skills: {skill_names}")
         try:
             # 计算skills目录路径
             # 当前文件在: agents/report_agent.py
@@ -97,12 +99,14 @@ class ReportAgent:
                 return None
             
             # 确定要加载的Skill路径
+            print("确定要加载的Skill路径...")
             skill_paths = []
             for name in skill_names:
                 skill_path = skills_dir / name
                 if skill_path.exists() and skill_path.is_dir():
                     skill_paths.append(str(skill_path))
                     logger.info(f"找到Skill: {name} at {skill_path}")
+                    print("001....")
                 else:
                     logger.warning(f"⚠️ Skill不存在: {name}")
                     print(f"⚠️ Skill不存在: {name}，跳过")
@@ -138,6 +142,8 @@ class ReportAgent:
                 LocalSkillsLoader(path) for path in skill_paths
             ])
             logger.info(f"✅ 使用 LocalSkillsLoader 加载了 {len(skill_paths)} 个Skill")
+            print("002....")
+
             return skills
         except ImportError:
             logger.debug("方式1导入失败，尝试方式2")
@@ -149,6 +155,7 @@ class ReportAgent:
             skills = Skills(loaders=[
                 LocalSkills(path) for path in skill_paths
             ])
+            print("003....",f"✅ 使用 LocalSkills 加载了 {len(skill_paths)} 个Skill")
             logger.info(f"✅ 使用 LocalSkills 加载了 {len(skill_paths)} 个Skill")
             return skills
         except ImportError:
