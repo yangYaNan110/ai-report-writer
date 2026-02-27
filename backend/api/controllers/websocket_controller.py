@@ -7,7 +7,7 @@ from typing import Dict, Optional
 from loguru import logger
 from store.conversation_store import ConversationStore
 from agents.report_agent import ReportAgent
-
+import asyncio
 router = APIRouter()
 
 # ==================== 全局 Agent 引用 ====================
@@ -61,9 +61,11 @@ async def websocket_endpoint(websocket: WebSocket, thread_id: str):
         logger.info(f"✅ WebSocket连接成功: {thread_id}")
         while True:
             data = await websocket.receive_json()
-            logger.debug(f"📥 收到消息 {thread_id}: {data.get("content")},{data.get("interrupt")}")
             data = data.get("data", "")
-            await handle_websocket_message(conv, data)
+            asyncio.create_task(
+                handle_websocket_message(conv,data)
+            )
+            # await handle_websocket_message(conv, data)
             
     except WebSocketDisconnect:
         logger.info(f"🔌 WebSocket断开连接: {thread_id}")
@@ -83,14 +85,42 @@ async def handle_websocket_message(
     data: Dict
 ):
     """处理消息"""
-    print(data,"006...")
+    try:
+        user_input = data.get("content", "")
+        print(data,"006...",user_input)
+
+        interrupt = data.get("interrupt", False)
+        # 第一步：无论什么消息 先中断当前正在执行的任务
+        await conv.interrupt_current_task()
+        print("007....")
+        # 第二步： 检查是否是纯打断指令 (后期可以交给ai来识别意图 开发阶段先实现功能)
+        stop_words = ["停止", "中断", "停下"]
+        if any(word in user_input for word in stop_words):
+            interrupt = True
+        if interrupt :
+            await conv.interupt_process()
+            return
+        # 有实际内容的消息 交给convStore处理
+        # processing内部会创建新的生成任务并保存引用
+        await conv.processing(user_input=user_input)
+        pass
+    except asyncio.CancelledError:
+        # 这个任务自己被更新消息的任务取消了
+        logger.info("消息处理器被取消")
+        await conv.websocket.send_json({
+            "type": "cancelled",
+            "message": "被新消息中断"
+        })
+    except Exception as e:
+        logger.error(f"消息处理器错误:{e}")
+        await conv.websocket.send_json({
+            "type": "error",
+            "message": str(e)
+        })
+
+
     
-    user_input = data.get("content", "")
-    interrupt = data.get("interrupt", False)
-    
-    async for chunk in conv.processing(user_input=user_input, interrupt=interrupt):
-        if chunk is not None:
-            await conv.websocket.send_json(chunk)
+   
 
 
 

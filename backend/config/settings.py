@@ -9,7 +9,7 @@ import os
 from dotenv import load_dotenv
 
 # 加载.env文件
-load_dotenv()
+load_dotenv(override=True)
 
 class Settings(BaseSettings):
     """应用配置类"""
@@ -44,7 +44,7 @@ class Settings(BaseSettings):
     
     # LLM配置
     OPENAI_API_KEY: Optional[str] = Field(default=None, env="OPENAI_API_KEY")
-    DASHSCOPE_API_KEY: Optional[str] = Field(default=None, env="DASHSCOPE_API_KEY")
+    DASHSCOPE_API_KEY: Optional[str] = Field(default='sk-1cca217abb40484cb0b982a9c7c9d08b', env="DASHSCOPE_API_KEY")
     
     # Agno配置
     AGNO_API_KEY: Optional[str] = Field(default=None, env="AGNO_API_KEY")
@@ -71,4 +71,5 @@ if settings.DEBUG:
     print(f"APP_ENV: {settings.APP_ENV}")
     print(f"DATABASE_URL: {settings.DATABASE_URL}")
     print(f"REDIS_URL: {settings.REDIS_URL}")
+    print(f"DASHSCOPE_API_KEY:{settings.DASHSCOPE_API_KEY}")
     print("=" * 50)

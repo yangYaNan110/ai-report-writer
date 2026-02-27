@@ -8,6 +8,7 @@ import json
 import asyncio
 import json
 from fastapi import WebSocket
+from loguru import logger
 
 
 class ConversationStore:
@@ -28,6 +29,7 @@ class ConversationStore:
         self.websocket = websocket  # 可选的WebSocket连接对象
         self._cancel_event = asyncio.Event()  # 初始状态: False
         self.full_response = ""
+        self.current_task: Optional[asyncio.Task] = None
     
     # ==================== 私有加载和保存方法 ====================
     
@@ -72,105 +74,144 @@ class ConversationStore:
                 请处理：
                 """
     
-    async def processing(self, user_input: str = None, interrupt: bool = False):
+    async def processing(self, user_input: str = None):
         """处理用户的交互反馈
         纯管道：组装上下文 → Agent 处理 → 流式输出
             
         """
-        print(f"\n🔄 [ConversationStore.processing] 处理输入: {user_input}, interrupt={interrupt}")
-        # - 第一先把历史消息加载过来 历史消息可能为空
-        # - 再把用户最新的消息进行处理
-        # - 根据用户和历史消息的内容， 分析用户的意图
-        # - 用户的意图可能是： 1.刚开始写报告。2.基于已有的历史进行修改。3.对某个段落进行修改。4.对某个段落进行重写。5.其他
-        # - 分析用户意图的时候。需要流式的分析过程返回给前端  
-        # - 分析出以后 就根据用户的意图进行执行 执行的过程也需要流式的返回给前端。
-        # - 每次执行完一个操作 就询问用户是否满意。用户如果满意就继续执行下一个操作。
-        # - 用户如果不满意 就根据用户的反馈进行修改。 
-        # - 这个过程是一个循环 直到用户确认报告完成。
-
-        print("005...",datetime.now(timezone.utc).isoformat())
-        # 如果有正在运行的，取消它
-        if interrupt:
-            try:
-                print("🛑 用户打断了，设置取消标志")
-                self._cancel_event.set()  #标志设为 True，通知正在运行的任务停止
-                # 给正在运行的任务一点时间响应取消
-                await asyncio.sleep(0.1)
-                # 重置标志，准备新的运行
-                self._cancel_event.clear()  # 标志重置为 False
-                pass
-            except asyncio.CancelledError:
-                pass
-            finally:
-                assistant_content = {"role": "assistant", "content": self.full_response, "timestamp": datetime.now(timezone.utc).isoformat()}
-                self.history.append(assistant_content)
-                await self._save(assistant_content)  # 保存对话状态到数据库 数据库方面以后再处理        
-                self.full_response= ""
-                # 如果是纯打断（没有新输入），就返回
-                if not user_input:
-                    yield {"type": "interrupt", "message": "已中断"}
-                    return
-        
-
-       # 组装上下文
-        context = {
-            "history": self.history[-10:],
-            "interrupt": interrupt,
-            "user_input": user_input
-        }
-
-        # 保存用户输入
-        if user_input:
-            current_content = {"role": "user", "content": user_input, "timestamp": datetime.now(timezone.utc).isoformat()}
-            self.history.append(current_content)
-            await self._save(current_content)  # 保存对话状态到数据库
-
-        
-
-
-        prompt = self.getPrompt(context)
-       
-            
-        print(f"🔄 before...." * 20)
-        print(prompt)
-        # 等待并yield结果
         try:
-            # 从任务中获取异步生成器
-            async for chunk in self.agent.run([{"role": "user", "content": prompt}], stream=True):
+            print("005...",datetime.now(timezone.utc).isoformat())
+            # 组装上下文
+            context = {
+                "history": self.history[-10:],
+                "user_input": user_input
+            }
 
-                # 关键：每次迭代都检查是否被打断
-                chunk_type = chunk.get("type", "chunk")
-                print("*" * 50)
-                print(chunk_type)
+            # 保存用户输入
+            if user_input:
+                current_content = {"role": "user", "content": user_input, "timestamp": datetime.now(timezone.utc).isoformat()}
+                self.history.append(current_content)
+                await self._save(current_content)  # 保存对话状态到数据库
+
+            prompt = self.getPrompt(context)
+            print(prompt, "提示词...")
+            # 创建新的生成任务
+            self.current_task = asyncio.create_task(
+                self._generate_response(prompt)
+            )
+
+            # 等待生成任务完成（或被新消息中断）
+            await self.current_task
+        except asyncio.CancelledError:
+            # 任务被取消，这是正常的
+            logger.info("生成任务被取消")
+            # 发送取消通知（可选）
+            await self.websocket.send_json({
+                "type": "cancelled",
+                "message": "生成被中断"
+            })
+            
+       
+    async def _generate_response(self, prompt: str):
+        """实际的生成逻辑（在独立任务中运行）"""
+        print("008....")
+        try:
+            # 假设您的agent.run是异步生成器
+            async for chunk in self.agent.run([{"role": "user", "content": prompt}], stream=True):
+                # 每次迭代检查是否被打断
                 if self._cancel_event.is_set():
-                    print("⏹️ 检测到取消标志，提前终止生成")
-                    break  # 立即停止生成
+                    logger.info("检测到取消标志，停止生成")
+                    break
+                
+                chunk_type = chunk.get("type", "chunk")
+                
                 if chunk_type == "chunk":
                     text = chunk.get("content", "")
+                    # print(isinstance(text, str))
+                    # print(text.encode('utf-8').decode('unicode-escape'))
+                    # print("6666...")
                     self.full_response += text
-                    print(text,"\n")
-                    yield {"type": "chunk", "content": text}
-                else:
-                    # 只有在没有被取消的情况下才保存
-                    print("=" * 30)
-                    print(chunk_type)
+                    
+                    # 发送给前端
+                    await self.websocket.send_json({
+                        "type": "chunk",
+                        "content": text
+                    })
+                    
+                elif chunk_type in ["done", "complete"]:
+                    # 生成完成
                     if not self._cancel_event.is_set():
-                        assistant_content = {"role": "assistant", "content": self.full_response, "timestamp": datetime.now(timezone.utc).isoformat()}
+                        # 保存助手回复
+                        assistant_content = {
+                            "role": "assistant",
+                            "content": self.full_response,
+                            "timestamp": datetime.now(timezone.utc).isoformat()
+                        }
                         self.history.append(assistant_content)
-                        await self._save(assistant_content)  # 保存对话状态到数据库 数据库方面以后再处理
-                        self.full_response= ""
-
+                        await self._save(assistant_content)
+                        
+                        # 发送完成信号
+                        # await self.websocket.send_json({
+                        #     "type": "complete",
+                        #     "content": self.full_response
+                        # })
+                        
+                        self.full_response = ""
+            
         except asyncio.CancelledError:
-            print("🛑 当前处理被取消")
-            # 确保任务也被取消
-            yield {"type": "cancelled"}
+            # 任务被外部取消
+            logger.info("_generate_response 被取消")
+            raise  # 重新抛出，让上层处理
         except Exception as e:
-            print(f"处理过程中发生错误: {str(e)}")
-            yield {
-                    "type": "error",
-                    "message": str(e)
-                }
-    
+            logger.error(f"生成错误: {e}")
+            await self.websocket.send_json({
+                "type": "error",
+                "message": str(e)
+            })
+        finally:
+            # 清理任务引用（如果当前任务就是自己）
+            if self.current_task == asyncio.current_task():
+                self.current_task = None
+
+
+    async def interrupt_current_task(self) -> bool:
+        '''
+        中断当前正在执行的任务
+        返回: True - 成功取消了任务, False - 没有任务需要取消
+        '''
+        if self.current_task and not self.current_task.done():
+            logger.info(f"中断当前任务:{self.current_task}")
+            self._cancel_event.set()
+
+            # 取消任务
+            self.current_task.cancel()
+            try:
+                #  等待任务真正取消（带超时）
+                await asyncio.wait_for(self.current_task, timeout=2.0)
+            except (asyncio.TimeoutError, asyncio.CancelledError):
+                # 超时或已取消，都没关系
+                pass
+            finally:
+                self._cancel_event.clear()
+                self.current_task = None
+
+            return True
+
+
+        return False
+
+
+    async def interupt_process(self):
+        print("已中断当前生成...")
+        assistant_content = {"role": "assistant", "content": self.full_response, "timestamp": datetime.now(timezone.utc).isoformat()}
+        self.history.append(assistant_content)
+        await self._save(assistant_content)  # 保存对话状态到数据库 数据库方面以后再处理        
+        self.full_response= ""
+        await self.websocket.send_json({
+                "type":"interrupt",
+                "content": "已中断当前生成"
+        })
+        print("中断结束....")
 
     
    

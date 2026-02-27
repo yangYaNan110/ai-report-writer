@@ -135,7 +135,8 @@ class AppStore {
             try {
                 
                 const data = JSON.parse(event.data);
-
+                console.log("收到消息...001",data);
+                
                 this.#dispatch(data);
             } catch (e) {
                 console.error('解析消息失败', e);
@@ -169,6 +170,7 @@ class AppStore {
             data,
             request_id: 'req_' + Math.random().toString(36).substr(2, 9)
         };
+        console.log("发送消息001...:",message);
         
         this.#state.ws.send(JSON.stringify(message));
         return true;
@@ -209,13 +211,12 @@ class AppStore {
      * @param {Object} data - 接收到的消息
      */
     #dispatch(data) {
-        console.log(data,"001....");
-        
         const { type, content: eventData } = data;
         
         const handlers = {
             'sync': () => this.#handleSync(eventData),
             'chunk': () => this.#handleChunk(eventData),
+            "interrupt": () => this.#handleChunk(eventData),
             'complete': () => this.#handleComplete(eventData),
             'message': () => this.#handleTextMessage(eventData),
             'error': () => this.#handleError(eventData)

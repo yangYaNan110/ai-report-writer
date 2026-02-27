@@ -111,10 +111,6 @@ function handleSend() {
 
 // ===== 渲染UI =====
 function render(state) {
-    console.log("==========");
-    
-    console.log(state);
-    
     updateConnectionStatus(state.connected);
     updateButtons(state.connected);
     updateThreadId(state.threadId);

@@ -42,10 +42,12 @@ class ReportAgent:
         if self._initialized:
             return
         # 从settings获取API Key
-        api_key = settings.DASHSCOPE_API_KEY
+        api_key = settings.OPENAI_API_KEY
         if not api_key:
             raise ValueError("❌ DASHSCOPE_API_KEY 环境变量未设置！请在.env文件中配置")
         
+        print("api-key" * 10)
+        print(api_key)
         # description = 个人简介（给用户看）
         # instructions = 员工手册（给Agent用）
         # 加载skills（如果指定了skill_names）
