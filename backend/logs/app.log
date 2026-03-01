@@ -10468,3 +10468,171 @@
 2026-02-27 13:34:25.810 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 🔌 WebSocket断开连接: test-123
 2026-02-27 13:34:25.811 | INFO     | api.controllers.websocket_controller:remove_conversation:48 - 📁 对话实例已移除: test-123
 2026-02-27 13:34:25.811 | INFO     | api.controllers.websocket_controller:remove_conversation:48 - 📁 对话实例已移除: test-123
+2026-02-27 13:48:31.111 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-27 13:48:31.111 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-27 13:48:31.111 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-27 13:48:31.111 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-27 13:48:31.137 | INFO     | api.controllers.websocket_controller:set_agent:22 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-27 13:48:31.137 | INFO     | api.controllers.websocket_controller:set_agent:22 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-27 13:48:31.137 | INFO     | main:lifespan:44 - 🤖 Agent 初始化完成
+2026-02-27 13:48:31.137 | INFO     | main:lifespan:44 - 🤖 Agent 初始化完成
+2026-02-27 13:48:33.448 | INFO     | api.controllers.websocket_controller:websocket_endpoint:56 - 📨 WebSocket连接请求: test-123 来自 127.0.0.1
+2026-02-27 13:48:33.448 | INFO     | api.controllers.websocket_controller:websocket_endpoint:56 - 📨 WebSocket连接请求: test-123 来自 127.0.0.1
+2026-02-27 13:48:33.449 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:38 - 📁 创建/加载对话实例: test-123
+2026-02-27 13:48:33.449 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:38 - 📁 创建/加载对话实例: test-123
+2026-02-27 13:48:33.449 | INFO     | api.controllers.websocket_controller:websocket_endpoint:61 - ✅ WebSocket连接成功: test-123
+2026-02-27 13:48:33.449 | INFO     | api.controllers.websocket_controller:websocket_endpoint:61 - ✅ WebSocket连接成功: test-123
+2026-02-27 13:49:22.363 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 🔌 WebSocket断开连接: test-123
+2026-02-27 13:49:22.363 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 🔌 WebSocket断开连接: test-123
+2026-02-27 13:49:22.363 | INFO     | api.controllers.websocket_controller:remove_conversation:48 - 📁 对话实例已移除: test-123
+2026-02-27 13:49:22.363 | INFO     | api.controllers.websocket_controller:remove_conversation:48 - 📁 对话实例已移除: test-123
+2026-02-27 13:49:22.401 | ERROR    | store.conversation_store:_generate_response:167 - 生成错误: Unexpected ASGI message 'websocket.send', after sending 'websocket.close' or response already completed.
+2026-02-27 13:49:22.401 | ERROR    | store.conversation_store:_generate_response:167 - 生成错误: Unexpected ASGI message 'websocket.send', after sending 'websocket.close' or response already completed.
+2026-02-27 13:49:22.401 | ERROR    | api.controllers.websocket_controller:handle_websocket_message:115 - 消息处理器错误:Unexpected ASGI message 'websocket.send', after sending 'websocket.close' or response already completed.
+2026-02-27 13:49:22.401 | ERROR    | api.controllers.websocket_controller:handle_websocket_message:115 - 消息处理器错误:Unexpected ASGI message 'websocket.send', after sending 'websocket.close' or response already completed.
+2026-02-27 13:49:22.464 | INFO     | main:lifespan:51 - 👋 应用关闭中...
+2026-02-27 13:49:22.464 | INFO     | main:lifespan:51 - 👋 应用关闭中...
+2026-02-27 13:49:22.464 | INFO     | main:lifespan:53 - ✅ 数据库连接已关闭
+2026-02-27 13:49:22.464 | INFO     | main:lifespan:53 - ✅ 数据库连接已关闭
+2026-02-27 13:51:11.303 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-27 13:51:11.303 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-27 13:51:11.303 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-27 13:51:11.303 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-27 13:51:11.328 | INFO     | api.controllers.websocket_controller:set_agent:22 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-27 13:51:11.328 | INFO     | api.controllers.websocket_controller:set_agent:22 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-27 13:51:11.328 | INFO     | main:lifespan:44 - 🤖 Agent 初始化完成
+2026-02-27 13:51:11.328 | INFO     | main:lifespan:44 - 🤖 Agent 初始化完成
+2026-02-27 13:51:15.087 | INFO     | api.controllers.websocket_controller:websocket_endpoint:56 - 📨 WebSocket连接请求: test-123 来自 127.0.0.1
+2026-02-27 13:51:15.087 | INFO     | api.controllers.websocket_controller:websocket_endpoint:56 - 📨 WebSocket连接请求: test-123 来自 127.0.0.1
+2026-02-27 13:51:15.087 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:38 - 📁 创建/加载对话实例: test-123
+2026-02-27 13:51:15.087 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:38 - 📁 创建/加载对话实例: test-123
+2026-02-27 13:51:15.087 | INFO     | api.controllers.websocket_controller:websocket_endpoint:61 - ✅ WebSocket连接成功: test-123
+2026-02-27 13:51:15.087 | INFO     | api.controllers.websocket_controller:websocket_endpoint:61 - ✅ WebSocket连接成功: test-123
+2026-02-27 13:51:31.495 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 🔌 WebSocket断开连接: test-123
+2026-02-27 13:51:31.495 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 🔌 WebSocket断开连接: test-123
+2026-02-27 13:51:31.495 | INFO     | api.controllers.websocket_controller:remove_conversation:48 - 📁 对话实例已移除: test-123
+2026-02-27 13:51:31.495 | INFO     | api.controllers.websocket_controller:remove_conversation:48 - 📁 对话实例已移除: test-123
+2026-02-27 13:51:31.536 | ERROR    | store.conversation_store:_generate_response:167 - 生成错误: Unexpected ASGI message 'websocket.send', after sending 'websocket.close' or response already completed.
+2026-02-27 13:51:31.536 | ERROR    | store.conversation_store:_generate_response:167 - 生成错误: Unexpected ASGI message 'websocket.send', after sending 'websocket.close' or response already completed.
+2026-02-27 13:51:31.536 | ERROR    | api.controllers.websocket_controller:handle_websocket_message:115 - 消息处理器错误:Unexpected ASGI message 'websocket.send', after sending 'websocket.close' or response already completed.
+2026-02-27 13:51:31.536 | ERROR    | api.controllers.websocket_controller:handle_websocket_message:115 - 消息处理器错误:Unexpected ASGI message 'websocket.send', after sending 'websocket.close' or response already completed.
+2026-02-27 13:51:31.596 | INFO     | main:lifespan:51 - 👋 应用关闭中...
+2026-02-27 13:51:31.596 | INFO     | main:lifespan:51 - 👋 应用关闭中...
+2026-02-27 13:51:31.596 | INFO     | main:lifespan:53 - ✅ 数据库连接已关闭
+2026-02-27 13:51:31.596 | INFO     | main:lifespan:53 - ✅ 数据库连接已关闭
+2026-02-27 13:51:59.378 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-27 13:51:59.378 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-27 13:51:59.378 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-27 13:51:59.378 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-27 13:51:59.402 | INFO     | api.controllers.websocket_controller:set_agent:22 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-27 13:51:59.402 | INFO     | api.controllers.websocket_controller:set_agent:22 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-27 13:51:59.402 | INFO     | main:lifespan:44 - 🤖 Agent 初始化完成
+2026-02-27 13:51:59.402 | INFO     | main:lifespan:44 - 🤖 Agent 初始化完成
+2026-02-27 13:52:00.363 | INFO     | api.controllers.websocket_controller:websocket_endpoint:56 - 📨 WebSocket连接请求: test-123 来自 127.0.0.1
+2026-02-27 13:52:00.363 | INFO     | api.controllers.websocket_controller:websocket_endpoint:56 - 📨 WebSocket连接请求: test-123 来自 127.0.0.1
+2026-02-27 13:52:00.363 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:38 - 📁 创建/加载对话实例: test-123
+2026-02-27 13:52:00.363 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:38 - 📁 创建/加载对话实例: test-123
+2026-02-27 13:52:00.364 | INFO     | api.controllers.websocket_controller:websocket_endpoint:61 - ✅ WebSocket连接成功: test-123
+2026-02-27 13:52:00.364 | INFO     | api.controllers.websocket_controller:websocket_endpoint:61 - ✅ WebSocket连接成功: test-123
+2026-02-27 13:52:18.572 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 🔌 WebSocket断开连接: test-123
+2026-02-27 13:52:18.572 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 🔌 WebSocket断开连接: test-123
+2026-02-27 13:52:18.573 | INFO     | api.controllers.websocket_controller:remove_conversation:48 - 📁 对话实例已移除: test-123
+2026-02-27 13:52:18.573 | INFO     | api.controllers.websocket_controller:remove_conversation:48 - 📁 对话实例已移除: test-123
+2026-02-27 13:52:18.651 | ERROR    | store.conversation_store:_generate_response:167 - 生成错误: Unexpected ASGI message 'websocket.send', after sending 'websocket.close' or response already completed.
+2026-02-27 13:52:18.651 | ERROR    | store.conversation_store:_generate_response:167 - 生成错误: Unexpected ASGI message 'websocket.send', after sending 'websocket.close' or response already completed.
+2026-02-27 13:52:18.651 | ERROR    | api.controllers.websocket_controller:handle_websocket_message:115 - 消息处理器错误:Unexpected ASGI message 'websocket.send', after sending 'websocket.close' or response already completed.
+2026-02-27 13:52:18.651 | ERROR    | api.controllers.websocket_controller:handle_websocket_message:115 - 消息处理器错误:Unexpected ASGI message 'websocket.send', after sending 'websocket.close' or response already completed.
+2026-02-27 14:25:21.868 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-27 14:25:21.868 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-27 14:25:21.868 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-27 14:25:21.868 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-27 14:25:21.900 | INFO     | api.controllers.websocket_controller:set_agent:22 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-27 14:25:21.900 | INFO     | api.controllers.websocket_controller:set_agent:22 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-27 14:25:21.900 | INFO     | main:lifespan:44 - 🤖 Agent 初始化完成
+2026-02-27 14:25:21.900 | INFO     | main:lifespan:44 - 🤖 Agent 初始化完成
+2026-02-27 14:25:28.326 | INFO     | api.controllers.websocket_controller:websocket_endpoint:56 - 📨 WebSocket连接请求: test-123 来自 127.0.0.1
+2026-02-27 14:25:28.326 | INFO     | api.controllers.websocket_controller:websocket_endpoint:56 - 📨 WebSocket连接请求: test-123 来自 127.0.0.1
+2026-02-27 14:25:28.326 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:38 - 📁 创建/加载对话实例: test-123
+2026-02-27 14:25:28.326 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:38 - 📁 创建/加载对话实例: test-123
+2026-02-27 14:25:28.327 | INFO     | api.controllers.websocket_controller:websocket_endpoint:61 - ✅ WebSocket连接成功: test-123
+2026-02-27 14:25:28.327 | INFO     | api.controllers.websocket_controller:websocket_endpoint:61 - ✅ WebSocket连接成功: test-123
+2026-02-27 14:25:47.819 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 🔌 WebSocket断开连接: test-123
+2026-02-27 14:25:47.819 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 🔌 WebSocket断开连接: test-123
+2026-02-27 14:25:47.819 | INFO     | api.controllers.websocket_controller:remove_conversation:48 - 📁 对话实例已移除: test-123
+2026-02-27 14:25:47.819 | INFO     | api.controllers.websocket_controller:remove_conversation:48 - 📁 对话实例已移除: test-123
+2026-02-27 14:25:47.850 | ERROR    | store.conversation_store:_generate_response:167 - 生成错误: Unexpected ASGI message 'websocket.send', after sending 'websocket.close' or response already completed.
+2026-02-27 14:25:47.850 | ERROR    | store.conversation_store:_generate_response:167 - 生成错误: Unexpected ASGI message 'websocket.send', after sending 'websocket.close' or response already completed.
+2026-02-27 14:25:47.850 | ERROR    | api.controllers.websocket_controller:handle_websocket_message:115 - 消息处理器错误:Unexpected ASGI message 'websocket.send', after sending 'websocket.close' or response already completed.
+2026-02-27 14:25:47.850 | ERROR    | api.controllers.websocket_controller:handle_websocket_message:115 - 消息处理器错误:Unexpected ASGI message 'websocket.send', after sending 'websocket.close' or response already completed.
+2026-02-27 14:25:47.920 | INFO     | main:lifespan:51 - 👋 应用关闭中...
+2026-02-27 14:25:47.920 | INFO     | main:lifespan:51 - 👋 应用关闭中...
+2026-02-27 14:25:47.920 | INFO     | main:lifespan:53 - ✅ 数据库连接已关闭
+2026-02-27 14:25:47.920 | INFO     | main:lifespan:53 - ✅ 数据库连接已关闭
+2026-02-27 14:26:25.981 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-27 14:26:25.981 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-02-27 14:26:25.981 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-27 14:26:25.981 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-02-27 14:26:26.005 | INFO     | api.controllers.websocket_controller:set_agent:22 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-27 14:26:26.005 | INFO     | api.controllers.websocket_controller:set_agent:22 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-02-27 14:26:26.005 | INFO     | main:lifespan:44 - 🤖 Agent 初始化完成
+2026-02-27 14:26:26.005 | INFO     | main:lifespan:44 - 🤖 Agent 初始化完成
+2026-02-27 14:26:31.225 | INFO     | api.controllers.websocket_controller:websocket_endpoint:56 - 📨 WebSocket连接请求: test-123 来自 127.0.0.1
+2026-02-27 14:26:31.225 | INFO     | api.controllers.websocket_controller:websocket_endpoint:56 - 📨 WebSocket连接请求: test-123 来自 127.0.0.1
+2026-02-27 14:26:31.225 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:38 - 📁 创建/加载对话实例: test-123
+2026-02-27 14:26:31.225 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:38 - 📁 创建/加载对话实例: test-123
+2026-02-27 14:26:31.225 | INFO     | api.controllers.websocket_controller:websocket_endpoint:61 - ✅ WebSocket连接成功: test-123
+2026-02-27 14:26:31.225 | INFO     | api.controllers.websocket_controller:websocket_endpoint:61 - ✅ WebSocket连接成功: test-123
+2026-02-27 14:26:47.620 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 🔌 WebSocket断开连接: test-123
+2026-02-27 14:26:47.620 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 🔌 WebSocket断开连接: test-123
+2026-02-27 14:26:47.620 | INFO     | api.controllers.websocket_controller:remove_conversation:48 - 📁 对话实例已移除: test-123
+2026-02-27 14:26:47.620 | INFO     | api.controllers.websocket_controller:remove_conversation:48 - 📁 对话实例已移除: test-123
+2026-02-27 14:26:47.659 | ERROR    | store.conversation_store:_generate_response:167 - 生成错误: Unexpected ASGI message 'websocket.send', after sending 'websocket.close' or response already completed.
+2026-02-27 14:26:47.659 | ERROR    | store.conversation_store:_generate_response:167 - 生成错误: Unexpected ASGI message 'websocket.send', after sending 'websocket.close' or response already completed.
+2026-02-27 14:26:47.660 | ERROR    | api.controllers.websocket_controller:handle_websocket_message:115 - 消息处理器错误:Unexpected ASGI message 'websocket.send', after sending 'websocket.close' or response already completed.
+2026-02-27 14:26:47.660 | ERROR    | api.controllers.websocket_controller:handle_websocket_message:115 - 消息处理器错误:Unexpected ASGI message 'websocket.send', after sending 'websocket.close' or response already completed.
+2026-02-27 14:26:47.721 | INFO     | main:lifespan:51 - 👋 应用关闭中...
+2026-02-27 14:26:47.721 | INFO     | main:lifespan:51 - 👋 应用关闭中...
+2026-02-27 14:26:47.721 | INFO     | main:lifespan:53 - ✅ 数据库连接已关闭
+2026-02-27 14:26:47.721 | INFO     | main:lifespan:53 - ✅ 数据库连接已关闭
+2026-03-01 17:24:52.328 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-03-01 17:24:52.328 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-03-01 17:24:52.329 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-03-01 17:24:52.329 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-03-01 17:24:52.357 | INFO     | api.controllers.websocket_controller:set_agent:22 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-03-01 17:24:52.357 | INFO     | api.controllers.websocket_controller:set_agent:22 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-03-01 17:24:52.357 | INFO     | main:lifespan:44 - 🤖 Agent 初始化完成
+2026-03-01 17:24:52.357 | INFO     | main:lifespan:44 - 🤖 Agent 初始化完成
+2026-03-01 17:25:03.056 | INFO     | api.controllers.websocket_controller:websocket_endpoint:56 - 📨 WebSocket连接请求: test-123 来自 127.0.0.1
+2026-03-01 17:25:03.056 | INFO     | api.controllers.websocket_controller:websocket_endpoint:56 - 📨 WebSocket连接请求: test-123 来自 127.0.0.1
+2026-03-01 17:25:03.056 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:38 - 📁 创建/加载对话实例: test-123
+2026-03-01 17:25:03.056 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:38 - 📁 创建/加载对话实例: test-123
+2026-03-01 17:25:03.057 | INFO     | api.controllers.websocket_controller:websocket_endpoint:61 - ✅ WebSocket连接成功: test-123
+2026-03-01 17:25:03.057 | INFO     | api.controllers.websocket_controller:websocket_endpoint:61 - ✅ WebSocket连接成功: test-123
+2026-03-01 17:25:22.914 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 🔌 WebSocket断开连接: test-123
+2026-03-01 17:25:22.914 | INFO     | api.controllers.websocket_controller:websocket_endpoint:71 - 🔌 WebSocket断开连接: test-123
+2026-03-01 17:25:22.915 | INFO     | api.controllers.websocket_controller:remove_conversation:48 - 📁 对话实例已移除: test-123
+2026-03-01 17:25:22.915 | INFO     | api.controllers.websocket_controller:remove_conversation:48 - 📁 对话实例已移除: test-123
+2026-03-01 17:25:23.016 | INFO     | main:lifespan:51 - 👋 应用关闭中...
+2026-03-01 17:25:23.016 | INFO     | main:lifespan:51 - 👋 应用关闭中...
+2026-03-01 17:25:23.016 | INFO     | main:lifespan:53 - ✅ 数据库连接已关闭
+2026-03-01 17:25:23.016 | INFO     | main:lifespan:53 - ✅ 数据库连接已关闭
+2026-03-01 17:30:53.737 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-03-01 17:30:53.737 | INFO     | main:lifespan:30 - 🚀 应用启动中...
+2026-03-01 17:30:53.738 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-03-01 17:30:53.738 | INFO     | main:lifespan:34 - ✅ 数据库就绪
+2026-03-01 17:30:53.768 | INFO     | api.controllers.websocket_controller:set_agent:22 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-03-01 17:30:53.768 | INFO     | api.controllers.websocket_controller:set_agent:22 - 🤖 WebSocket 控制器已获取 Agent 引用
+2026-03-01 17:30:53.768 | INFO     | main:lifespan:44 - 🤖 Agent 初始化完成
+2026-03-01 17:30:53.768 | INFO     | main:lifespan:44 - 🤖 Agent 初始化完成
+2026-03-01 17:30:54.610 | INFO     | api.controllers.websocket_controller:websocket_endpoint:56 - 📨 WebSocket连接请求: test-123 来自 127.0.0.1
+2026-03-01 17:30:54.610 | INFO     | api.controllers.websocket_controller:websocket_endpoint:56 - 📨 WebSocket连接请求: test-123 来自 127.0.0.1
+2026-03-01 17:30:54.610 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:38 - 📁 创建/加载对话实例: test-123
+2026-03-01 17:30:54.610 | INFO     | api.controllers.websocket_controller:get_or_create_conversation:38 - 📁 创建/加载对话实例: test-123
+2026-03-01 17:30:54.610 | INFO     | api.controllers.websocket_controller:websocket_endpoint:61 - ✅ WebSocket连接成功: test-123
+2026-03-01 17:30:54.610 | INFO     | api.controllers.websocket_controller:websocket_endpoint:61 - ✅ WebSocket连接成功: test-123
+2026-03-01 17:31:18.744 | INFO     | store.conversation_store:interrupt_current_task:184 - 中断当前任务:<Task pending name='Task-34' coro=<ConversationStore._generate_response() running at /Users/yangyanan/yyn/node/09_demo/ai-report-writer/backend/store/conversation_store.py:120> wait_for=<Future pending cb=[Task.task_wakeup()]> cb=[Task.task_wakeup()]>
+2026-03-01 17:31:18.744 | INFO     | store.conversation_store:interrupt_current_task:184 - 中断当前任务:<Task pending name='Task-34' coro=<ConversationStore._generate_response() running at /Users/yangyanan/yyn/node/09_demo/ai-report-writer/backend/store/conversation_store.py:120> wait_for=<Future pending cb=[Task.task_wakeup()]> cb=[Task.task_wakeup()]>
+2026-03-01 17:31:18.745 | INFO     | store.conversation_store:_generate_response:164 - _generate_response 被取消
+2026-03-01 17:31:18.745 | INFO     | store.conversation_store:_generate_response:164 - _generate_response 被取消
+2026-03-01 17:31:18.745 | INFO     | store.conversation_store:processing:107 - 生成任务被取消
+2026-03-01 17:31:18.745 | INFO     | store.conversation_store:processing:107 - 生成任务被取消

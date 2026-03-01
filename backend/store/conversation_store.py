@@ -126,6 +126,7 @@ class ConversationStore:
                 chunk_type = chunk.get("type", "chunk")
                 
                 if chunk_type == "chunk":
+                    print(chunk)
                     text = chunk.get("content", "")
                     # print(isinstance(text, str))
                     # print(text.encode('utf-8').decode('unicode-escape'))
