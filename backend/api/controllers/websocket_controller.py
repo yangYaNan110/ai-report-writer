@@ -6,6 +6,7 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from typing import Dict, Optional
 from loguru import logger
 from store.conversation_store import ConversationStore
+
 from agents.report_agent import ReportAgent
 import asyncio
 router = APIRouter()
@@ -54,18 +55,27 @@ async def websocket_endpoint(websocket: WebSocket, thread_id: str):
     """WebSocket 主端点"""
     client_host = websocket.client.host if websocket.client else "unknown"
     logger.info(f"📨 WebSocket连接请求: {thread_id} 来自 {client_host}")
-    
+    current_task = None  # 跟踪当前任务
     try:
         conv = await get_or_create_conversation(thread_id, websocket)
         await websocket.accept()
         logger.info(f"✅ WebSocket连接成功: {thread_id}")
         while True:
             data = await websocket.receive_json()
-            data = data.get("data", "")
-            asyncio.create_task(
-                handle_websocket_message(conv,data)
+            data = data.get("data", "").get("content","")
+            
+            # 取消旧任务
+            if current_task and not current_task.done():
+                current_task.cancel()
+                try:
+                    # 给旧任务一点时间清理
+                    await asyncio.wait_for(current_task, timeout=1.0)
+                except (asyncio.CancelledError, asyncio.TimeoutError):
+                    pass
+             # 创建新任务
+            current_task = asyncio.create_task(
+                handle_websocket_message(conv, data)
             )
-            # await handle_websocket_message(conv, data)
             
     except WebSocketDisconnect:
         logger.info(f"🔌 WebSocket断开连接: {thread_id}")
@@ -77,6 +87,10 @@ async def websocket_endpoint(websocket: WebSocket, thread_id: str):
             await websocket.close(code=1011, reason=f"服务器错误: {str(e)}")
         except:
             pass
+    finally:
+        # 清理最后一个任务
+        if current_task and not current_task.done():
+            current_task.cancel()
 
 # ==================== 消息分发 ====================
 
@@ -86,37 +100,22 @@ async def handle_websocket_message(
 ):
     """处理消息"""
     try:
-        user_input = data.get("content", "")
-        print(data,"006...",user_input)
-
-        interrupt = data.get("interrupt", False)
-        # 第一步：无论什么消息 先中断当前正在执行的任务
-        await conv.interrupt_current_task()
-        print("007....")
-        # 第二步： 检查是否是纯打断指令 (后期可以交给ai来识别意图 开发阶段先实现功能)
-        stop_words = ["停止", "中断", "停下"]
-        if any(word in user_input for word in stop_words):
-            interrupt = True
-        if interrupt :
-            await conv.interupt_process()
-            return
-        # 有实际内容的消息 交给convStore处理
-        # processing内部会创建新的生成任务并保存引用
-        await conv.processing(user_input=user_input)
-        pass
+        # 处理消息
+        await conv.process_message(data)
     except asyncio.CancelledError:
-        # 这个任务自己被更新消息的任务取消了
-        logger.info("消息处理器被取消")
-        await conv.websocket.send_json({
-            "type": "cancelled",
-            "message": "被新消息中断"
-        })
+        # 任务被取消时的清理工作
+        logger.info("handle_websocket_message 被取消")
+        # 可以在这里做清理，比如通知前端
+        try:
+            await conv.websocket.send_json({
+                "type": "cancelled",
+                "message": "您的请求被新指令取代"
+            })
+        except:
+            pass
+        raise  # 重新抛出，让上层知道被取消了
     except Exception as e:
-        logger.error(f"消息处理器错误:{e}")
-        await conv.websocket.send_json({
-            "type": "error",
-            "message": str(e)
-        })
+        logger.error(f"处理消息错误: {e}")
 
 
     
